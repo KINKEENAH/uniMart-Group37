@@ -1,7 +1,8 @@
 import { useState } from "react";
 import { useNavigate, useLocation } from "react-router-dom";
-import { Search, Heart, ShoppingCart } from "lucide-react";
+import { Search, Heart, ShoppingCart, BellDot, User } from "lucide-react";
 import { motion } from "framer-motion";
+import { useAuth } from "../context/authContext";
 
 const navLinks = [
   { name: "Home", path: "/" },
@@ -12,6 +13,7 @@ const navLinks = [
 
 export default function Navbar() {
   const [isOpen, setIsOpen] = useState(false);
+  const { isLoggedIn } = useAuth();
   const navigate = useNavigate();
   const location = useLocation();
   return (
@@ -39,28 +41,51 @@ export default function Navbar() {
           <button className="cursor-pointer hover:text-gray-500">
             <Heart size={17} />
           </button>
-          <button className="cursor-pointer hover:text-gray-500">
+          <button 
+          onClick ={()=> navigate("/viewcart")}
+          className={`cursor-pointer hover:text-gray-500 ${location.pathname === "/viewcart"?"underline":""}`}>
             <ShoppingCart size={17} />
           </button>
-          <motion.a
-            whileHover={{ scale: 1.05 }}
-            whileTap={{ scale: 0.95 }}
-            transition={{ duration: 0.5, ease: "easeOut" }}
-            onClick={() => navigate("/signup")}
-            className={`tracking-widest text-sm cursor-pointer hover:text-gray-500  font-inter ${location.pathname === "/signup" ? " font-bold underline" : "font-normal"}`}
-          >
-            Sign Up
-          </motion.a>
-          <motion.a
-            whileHover={{ scale: 1.05 }}
-            whileTap={{ scale: 0.95 }}
-            transition={{ duration: 0.5, ease: "easeOut" }}
-            onClick={() => navigate("/login")}
-            className={`tracking-widest text-sm cursor-pointer hover:text-gray-500  font-inter ${location.pathname === "/login" ? "font-semibold underline" : "font-normal"}`}
-          >
-            Login
-          </motion.a>
+          {isLoggedIn ? (
+            <>
+              <button
+                onClick={() => navigate("/notification")}
+                className={`coursor-pointer hover:text-gray-500 ${location.pathname === "/notification" ? "underline" : ""}`}
+              >
+                <BellDot size={17} />
+              </button>
+
+              <button
+                onClick={() => navigate("/buyerprofile")}
+                className={`coursor-pointer hover:text-gray-500 ${location.pathname === "/buyerprofile" ? "underline" : ""}`}
+              >
+                <User size={17} />
+              </button>
+            </>
+          ) : (
+            <>
+              <motion.a
+                whileHover={{ scale: 1.05 }}
+                whileTap={{ scale: 0.95 }}
+                transition={{ duration: 0.5, ease: "easeOut" }}
+                onClick={() => navigate("/signup")}
+                className={`tracking-widest text-sm cursor-pointer hover:text-gray-500  font-inter ${location.pathname === "/signup" ? " font-bold underline" : "font-normal"}`}
+              >
+                Sign Up
+              </motion.a>
+              <motion.a
+                whileHover={{ scale: 1.05 }}
+                whileTap={{ scale: 0.95 }}
+                transition={{ duration: 0.5, ease: "easeOut" }}
+                onClick={() => navigate("/login")}
+                className={`tracking-widest text-sm cursor-pointer hover:text-gray-500  font-inter ${location.pathname === "/login" ? "font-semibold underline" : "font-normal"}`}
+              >
+                Login
+              </motion.a>
+            </>
+          )}
         </div>
+
         {/* Hamburger — mobile */}
         <button
           onClick={() => setIsOpen(!isOpen)}

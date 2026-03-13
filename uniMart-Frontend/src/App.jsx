@@ -8,6 +8,12 @@ import Signup from "./pages/auth/signup";
 import AboutUs from "./pages/aboutUs";
 import ContactUs from "./pages/contactUs";
 import Shop from "./pages/shop";
+import Notification from "./pages/notification";
+import BuyerProfile from "./pages/buyerProfile";
+import ViewCart from "./pages/viewCart";
+import ProductDetails from "./pages/productDetails";
+import ChatSeller from "./pages/chatSeller";
+import Checkout from "./pages/checkout"
 function App() {
   const location = useLocation();
   return (
@@ -21,6 +27,12 @@ function App() {
         <Route path="/about" element={<AboutUs />} />
         <Route path="/contact" element={<ContactUs />} />
         <Route path="/shop" element={<Shop />} />
+        <Route path="/notification" element={<Notification/>}></Route>
+        <Route path="/buyerprofile" element={<BuyerProfile/>}></Route>
+        <Route path="/viewcart" element={< ViewCart/>}></Route>
+        <Route path="/productdetails" element={< ProductDetails/>}></Route>
+        <Route path='/chatseller' element={<ChatSeller/>}></Route>
+      <Route path = "/checkout" element={<Checkout/>}></Route>
       </Routes>
       </AnimatePresence>
     </>
