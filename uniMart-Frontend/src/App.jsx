@@ -1,4 +1,5 @@
-import { Routes, Route } from "react-router-dom";
+import { Routes, Route, useLocation } from "react-router-dom";
+import { AnimatePresence } from "framer-motion";
 import NavBar from "./components/navbar";
 import "./App.css";
 import Home from "./pages/home";
@@ -8,10 +9,12 @@ import AboutUs from "./pages/aboutUs";
 import ContactUs from "./pages/contactUs";
 import Shop from "./pages/shop";
 function App() {
+  const location = useLocation();
   return (
     <>
       <NavBar />
-      <Routes>
+      <AnimatePresence mode="wait">
+      <Routes location={location} key={location.pathname}>
         <Route path="/" element={<Home />} />
         <Route path="/login" element={<Login />} />
         <Route path="/signup" element={<Signup />} />
@@ -19,6 +22,7 @@ function App() {
         <Route path="/contact" element={<ContactUs />} />
         <Route path="/shop" element={<Shop />} />
       </Routes>
+      </AnimatePresence>
     </>
   );
 }
