@@ -11,3 +11,7 @@
   src: url("./assets/fonts/NicoMoji.ttf") format("truetype");
 }
 
+body {
+  font-family: var(--font-inter);
+}
+
