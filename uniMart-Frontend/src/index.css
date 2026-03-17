@@ -15,3 +15,14 @@
 html {
   scroll-behavior: smooth;
 }
+input::-ms-reveal,
+input::-ms-clear {
+  display: none;
+}
+
+input::-webkit-credentials-auto-fill-button {
+  display: none;
+}
+input[type="checkbox"] {
+  accent-color: black;
+}

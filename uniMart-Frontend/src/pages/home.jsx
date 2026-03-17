@@ -9,7 +9,7 @@ export default function Home() {
           <img
             src=""
             alt="Shopping"
-            className="md:h-130 md:w-170  rounded-full object-cover bg-gray-300 -ml-35 -mb-30"
+            className="md:h-130 md:w-170  rounded-full object-cover object-bottom bg-gray-300 -ml-35 -mb-30"
           />
         </div>
         <div className="">
