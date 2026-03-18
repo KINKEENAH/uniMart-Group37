@@ -3,6 +3,7 @@ import { useNavigate } from "react-router-dom";
 import { Eye, EyeOff } from "lucide-react";
 import { useState } from "react";
 import { motion } from "framer-motion";
+import { useLocation } from "react-router-dom";
 
 export default function Login() {
   const [password, setPassword] = useState("");
@@ -10,6 +11,13 @@ export default function Login() {
   const [checked, setChecked] = useState(false);
   const { login } = useAuth();
   const navigate = useNavigate();
+  const location = useLocation()
+
+  const from = location.state?.from||"/";
+  const handleLogin =()=>{
+    login();
+    navigate(from);
+  }
 
   
 
@@ -73,7 +81,7 @@ export default function Login() {
           </div>
           <div className="flex justify-center border bg-black rounded-xl  mt-5 ml-9">
             <button
-              onClick={() => navigate("/loginotp")}
+              onClick={() => navigate("/loginotp", {state:{from}})}
               className="text-white p-3.5 cursor-pointer hover:hover:text-gray-500 "
             >
               LOGIN

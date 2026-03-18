@@ -2,19 +2,20 @@ import { useState, useRef } from "react";
 import { useNavigate } from "react-router-dom";
 import { motion } from "framer-motion";
 import { useAuth } from "../../context/authContext";
+import { useLocation } from "react-router-dom";
 
 export default function LoginOtp() {
   const navigate = useNavigate();
   const { login } = useAuth();
   const [otp, setOtp] = useState(["", "", "", "", "", ""]);
   const inputs = useRef([]);
+  const location = useLocation();
+  const from = location.state?.from || "/";
 
-   const handleLogin = () => {
+  const handleLogin = () => {
     login();
-    navigate("/shop");
+    navigate(from);
   };
-
-  
 
   const handleChange = (value, index) => {
     if (isNaN(value)) return;

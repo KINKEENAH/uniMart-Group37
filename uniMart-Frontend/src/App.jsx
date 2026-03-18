@@ -16,7 +16,8 @@ import ChatSeller from "./pages/chatSeller";
 import Checkout from "./pages/checkout";
 import EmailOtp from "./pages/auth/emailOtp";
 import LoginOtp from "./pages/auth/loginotp";
-
+import SellerDash from "./pages/sellerDashboard";
+import SellerProfile from "./pages/sellerProfile";
 function App() {
   const location = useLocation();
   return (
@@ -38,6 +39,8 @@ function App() {
           <Route path="/checkout" element={<Checkout />}></Route>
           <Route path="/emailotp" element={<EmailOtp />}></Route>
            <Route path="/loginotp" element={<LoginOtp />}></Route>
+           <Route path="/sellerdashboard" element={<SellerDash/>}></Route>
+           <Route path="/sellerprofile" element={<SellerProfile/>}/>
         </Routes>
       </AnimatePresence>
     </>
