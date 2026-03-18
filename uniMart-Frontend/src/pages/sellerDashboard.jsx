@@ -83,11 +83,19 @@ export default function SellerDash() {
       ? products
       : products.filter((p) => p.status === filter);
 
+  const handleProfileClick = () => {
+    if (isLoggedIn) {
+      navigate("/sellerprofile");
+    } else {
+      navigate("/login", { state: { from: "/sellerprofile" } });
+    }
+  };
+
   const handleAddProduct = () => {
     if (isLoggedIn) {
-      navigate("/shop");
+      navigate("/addproduct");
     } else {
-      navigate("/login", { state: { from: "/sellerdashboard" } });
+      navigate("/login", { state: { from: "/addproduct" } });
     }
   };
 
@@ -99,7 +107,7 @@ export default function SellerDash() {
           <div className="flex flex-col md:flex-row md:items-start justify-between gap-4">
             <div className="flex items-start gap-4">
               <div
-                onClick={() => navigate("/sellerprofile")}
+                onClick={handleProfileClick}
                 className="relative shrink-0 cursor-pointer"
               >
                 <div className="w-14 h-14 md:w-16 md:h-16 rounded-full bg-gray-200 flex items-center justify-center hover:opacity-80 transition-opacity">
@@ -109,7 +117,7 @@ export default function SellerDash() {
               </div>
               <div>
                 <h2
-                  onClick={() => navigate("/sellerprofile")}
+                  onClick={handleProfileClick}
                   className="text-lg md:text-xl font-bold text-[#1A1A1A] cursor-pointer hover:underline"
                 >
                   Prince Owusu
