@@ -1,55 +1,7 @@
-<<<<<<< HEAD
 import { useNavigate } from "react-router-dom"
-export default function Notification(){
-  const navigate = useNavigate();
-  return(
-    <div className="pt-24">
-     
-      Notification Page
-       <button onClick={()=>navigate("/whatsappchat")}> Go to the chat page </button>
-=======
-// export default function Notification(){
-//   return(
-//     <div className="pt-24">
-//       Notification Page
-//     </div>
-//   )
-// }
-
-// export default function Notification(){
-//   return(
-//     <div className="pt-24">
-//       Notification Page
-//     </div>
-//   )
-// }
-
-// export default function Notification(){
-//   return(
-//     <div className="pt-24">
-//       Notification Page
-//     </div>
-//   )
-// }
-
-// export default function Notification(){
-//   return(
-//     <div className="pt-24">
-//       Notification Page
-//     </div>
-//   )
-// }
-
-// export default function Notification(){
-//   return(
-//     <div className="pt-24">
-//       Notification Page
-//     </div>
-//   )
-// }
-
 import { useState } from "react";
-import { useNavigate } from "react-router-dom";
+
+
 
 const notificationsData = [
   {
@@ -259,7 +211,7 @@ export default function Notification() {
               <div className="flex items-start gap-3">
 
                 {/* Icon */}
-                <div className={`mt-0.5 p-2 rounded-full border flex-shrink-0 ${
+                <div className={`mt-0.5 p-2 rounded-full border shrink-0 ${
                   !n.read ? "border-gray-400 text-gray-700 bg-white" : "border-gray-200 text-gray-400 bg-white"
                 }`}>
                   {getIcon(n.type)}
@@ -307,7 +259,7 @@ export default function Notification() {
                 </div>
 
                 {/* Right icons */}
-                <div className="flex items-center gap-2 ml-1 flex-shrink-0">
+                <div className="flex items-center gap-2 ml-1 shrink-0">
                   <button
                     onClick={() => markRead(n.id)}
                     className="text-gray-300 hover:text-gray-600 transition"
@@ -420,7 +372,6 @@ export default function Notification() {
         </div>
       )}
 
->>>>>>> 69142fe83f59097b1c91be8942577ad67e101039
     </div>
   );
 }
