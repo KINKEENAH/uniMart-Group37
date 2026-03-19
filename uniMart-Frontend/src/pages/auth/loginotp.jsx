@@ -2,7 +2,6 @@ import { useState, useRef } from "react";
 import { useNavigate, useLocation } from "react-router-dom";
 import { motion } from "framer-motion";
 import { useAuth } from "../../context/authContext";
-import { useLocation } from "react-router-dom";
 
 export default function LoginOtp() {
   const [otp, setOtp] = useState(["", "", "", "", "", ""]);
@@ -10,13 +9,11 @@ export default function LoginOtp() {
   const [loading, setLoading] = useState(false);
   const [resendMsg, setResendMsg] = useState("");
   const inputs = useRef([]);
+  const navigate = useNavigate();
   const location = useLocation();
-  const from = location.state?.from || "/";
+  const { login } = useAuth();
 
-  const handleLogin = () => {
-    login();
-    navigate(from);
-  };
+  const { user_id, email } = location.state || {};
 
   const handleChange = (value, index) => {
     if (isNaN(value)) return;
@@ -56,7 +53,6 @@ export default function LoginOtp() {
         return setError(data.message || "Verification failed");
       }
 
-      // Store user + token in context, then go to shop
       login(data.user, data.token);
       navigate("/shop");
     } catch (err) {
