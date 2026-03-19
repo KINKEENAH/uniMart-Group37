@@ -34,7 +34,7 @@ export default function Home() {
               whileHover={{ scale: 1.05 }}
               whileTap={{ scale: 0.95 }}
               transition={{ duration: 0.5, ease: "easeOut" }}
-              onClick={() => navigate("/login")}
+              onClick={() => navigate("/sellerdashboard")}
               className="bg-[#515151] rounded-xl p-2 px-8  text-white font-inter"
             >
               Start Selling

@@ -2,6 +2,7 @@ import { useNavigate } from "react-router-dom";
 import { Eye, EyeOff } from "lucide-react";
 import { useState } from "react";
 import { motion } from "framer-motion";
+import { useLocation } from "react-router-dom";
 
 export default function Login() {
   const [email, setEmail] = useState("");
@@ -10,6 +11,13 @@ export default function Login() {
   const [error, setError] = useState("");
   const [loading, setLoading] = useState(false);
   const navigate = useNavigate();
+  const location = useLocation()
+
+  const from = location.state?.from||"/";
+  const handleLogin =()=>{
+    login();
+    navigate(from);
+  }
 
   const handleLogin = async () => {
     setError("");
@@ -92,9 +100,8 @@ export default function Login() {
 
           <div className="flex justify-center border bg-black rounded-xl mt-5 ml-9">
             <button
-              onClick={handleLogin}
-              disabled={loading}
-              className="text-white p-3.5 cursor-pointer hover:text-gray-400 disabled:opacity-60 w-full"
+              onClick={() => navigate("/loginotp", {state:{from}})}
+              className="text-white p-3.5 cursor-pointer hover:hover:text-gray-500 "
             >
               {loading ? "Logging in..." : "LOGIN"}
             </button>

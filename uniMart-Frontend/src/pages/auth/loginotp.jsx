@@ -2,6 +2,7 @@ import { useState, useRef } from "react";
 import { useNavigate, useLocation } from "react-router-dom";
 import { motion } from "framer-motion";
 import { useAuth } from "../../context/authContext";
+import { useLocation } from "react-router-dom";
 
 export default function LoginOtp() {
   const [otp, setOtp] = useState(["", "", "", "", "", ""]);
@@ -9,12 +10,13 @@ export default function LoginOtp() {
   const [loading, setLoading] = useState(false);
   const [resendMsg, setResendMsg] = useState("");
   const inputs = useRef([]);
-  const navigate = useNavigate();
   const location = useLocation();
-  const { login } = useAuth();
+  const from = location.state?.from || "/";
 
-  // user_id and email passed from login page
-  const { user_id, email } = location.state || {};
+  const handleLogin = () => {
+    login();
+    navigate(from);
+  };
 
   const handleChange = (value, index) => {
     if (isNaN(value)) return;
