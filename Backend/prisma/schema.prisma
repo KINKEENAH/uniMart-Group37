@@ -1,0 +1,247 @@
+generator client {
+  provider = "prisma-client-js"
+}
+
+datasource db {
+  provider = "postgresql"
+  url      = env("DATABASE_URL")
+}
+
+model User {
+  id              String    @id @default(uuid())
+  full_name       String
+  student_id      String    @unique
+  email           String    @unique
+  password_hash   String
+  phone           String?
+  department      String?
+  level           String?
+  campus_location String?
+  is_verified     Boolean   @default(false)
+  rating          Float     @default(0)
+  total_sales     Int       @default(0)
+  student_since   DateTime?
+  created_at      DateTime  @default(now())
+  updated_at      DateTime  @updatedAt
+
+  email_verifications  EmailVerification[]
+  products             Product[]
+  wishlists            Wishlist[]
+  cart_items           CartItem[]
+  orders               Order[]
+  buyer_conversations  Conversation[]  @relation("BuyerConversations")
+  seller_conversations Conversation[]  @relation("SellerConversations")
+  messages             Message[]
+  notifications        Notification[]
+  contact_messages     ContactMessage[]
+
+  @@map("users")
+}
+
+model EmailVerification {
+  id         String   @id @default(uuid())
+  user_id    String
+  code       String
+  is_used    Boolean  @default(false)
+  expires_at DateTime
+  created_at DateTime @default(now())
+
+  user User @relation(fields: [user_id], references: [id], onDelete: Cascade)
+
+  @@map("email_verifications")
+}
+
+model Category {
+  id       String    @id @default(uuid())
+  name     String
+  slug     String    @unique
+  products Product[]
+
+  @@map("categories")
+}
+
+model Product {
+  id             String   @id @default(uuid())
+  seller_id      String
+  category_id    String
+  title          String
+  description    String?
+  price          Decimal  @db.Decimal(10, 2)
+  original_price Decimal? @db.Decimal(10, 2)
+  stock_quantity Int      @default(0)
+  status         String   @default("active")
+  views          Int      @default(0)
+  sales_count    Int      @default(0)
+  created_at     DateTime @default(now())
+  updated_at     DateTime @updatedAt
+
+  seller       User                @relation(fields: [seller_id], references: [id], onDelete: Cascade)
+  category     Category            @relation(fields: [category_id], references: [id])
+  images       ProductImage[]
+  key_features ProductKeyFeature[]
+  wishlists    Wishlist[]
+  cart_items   CartItem[]
+  order_items  OrderItem[]
+  conversations Conversation[]
+
+  @@map("products")
+}
+
+model ProductImage {
+  id            String @id @default(uuid())
+  product_id    String
+  image_url     String
+  display_order Int    @default(0)
+
+  product Product @relation(fields: [product_id], references: [id], onDelete: Cascade)
+
+  @@map("product_images")
+}
+
+model ProductKeyFeature {
+  id         String @id @default(uuid())
+  product_id String
+  feature    String
+
+  product Product @relation(fields: [product_id], references: [id], onDelete: Cascade)
+
+  @@map("product_key_features")
+}
+
+model Wishlist {
+  id         String   @id @default(uuid())
+  user_id    String
+  product_id String
+  created_at DateTime @default(now())
+
+  user    User    @relation(fields: [user_id], references: [id], onDelete: Cascade)
+  product Product @relation(fields: [product_id], references: [id], onDelete: Cascade)
+
+  @@map("wishlists")
+}
+
+model CartItem {
+  id         String   @id @default(uuid())
+  user_id    String
+  product_id String
+  quantity   Int      @default(1)
+  added_at   DateTime @default(now())
+
+  user    User    @relation(fields: [user_id], references: [id], onDelete: Cascade)
+  product Product @relation(fields: [product_id], references: [id], onDelete: Cascade)
+
+  @@map("cart_items")
+}
+
+model MeetupLocation {
+  id                 String  @id @default(uuid())
+  name               String
+  description        String?
+  availability_hours String?
+  is_active          Boolean @default(true)
+
+  orders Order[]
+
+  @@map("meetup_locations")
+}
+
+model Order {
+  id                 String    @id @default(uuid())
+  buyer_id           String
+  meetup_location_id String?
+  status             String    @default("pending")
+  subtotal           Decimal   @db.Decimal(10, 2)
+  tax_amount         Decimal   @default(0) @db.Decimal(10, 2)
+  delivery_fee       Decimal   @default(0) @db.Decimal(10, 2)
+  total_amount       Decimal   @db.Decimal(10, 2)
+  payment_method     String?
+  payment_status     String    @default("pending")
+  confirmed_at       DateTime?
+  created_at         DateTime  @default(now())
+  updated_at         DateTime  @updatedAt
+
+  buyer           User            @relation(fields: [buyer_id], references: [id], onDelete: Cascade)
+  meetup_location MeetupLocation? @relation(fields: [meetup_location_id], references: [id])
+  order_items     OrderItem[]
+
+  @@map("orders")
+}
+
+model OrderItem {
+  id         String  @id @default(uuid())
+  order_id   String
+  product_id String
+  seller_id  String
+  quantity   Int
+  unit_price Decimal @db.Decimal(10, 2)
+  subtotal   Decimal @db.Decimal(10, 2)
+
+  order   Order   @relation(fields: [order_id], references: [id], onDelete: Cascade)
+  product Product @relation(fields: [product_id], references: [id])
+
+  @@map("order_items")
+}
+
+model Conversation {
+  id              String    @id @default(uuid())
+  buyer_id        String
+  seller_id       String
+  product_id      String?
+  is_ai_chat      Boolean   @default(false)
+  last_message_at DateTime?
+  created_at      DateTime  @default(now())
+
+  buyer    User     @relation("BuyerConversations", fields: [buyer_id], references: [id], onDelete: Cascade)
+  seller   User     @relation("SellerConversations", fields: [seller_id], references: [id], onDelete: Cascade)
+  product  Product? @relation(fields: [product_id], references: [id])
+  messages Message[]
+
+  @@map("conversations")
+}
+
+model Message {
+  id              String   @id @default(uuid())
+  conversation_id String
+  sender_id       String
+  content         String
+  is_read         Boolean  @default(false)
+  sent_at         DateTime @default(now())
+
+  conversation Conversation @relation(fields: [conversation_id], references: [id], onDelete: Cascade)
+  sender       User         @relation(fields: [sender_id], references: [id], onDelete: Cascade)
+
+  @@map("messages")
+}
+
+model Notification {
+  id         String   @id @default(uuid())
+  user_id    String
+  type       String
+  title      String
+  body       String
+  action_url String?
+  is_read    Boolean  @default(false)
+  created_at DateTime @default(now())
+
+  user User @relation(fields: [user_id], references: [id], onDelete: Cascade)
+
+  @@map("notifications")
+}
+
+model ContactMessage {
+  id             String   @id @default(uuid())
+  user_id        String?
+  first_name     String
+  last_name      String
+  email          String
+  subject        String
+  order_number   String?
+  message        String
+  agree_followup Boolean  @default(false)
+  status         String   @default("open")
+  created_at     DateTime @default(now())
+
+  user User? @relation(fields: [user_id], references: [id])
+
+  @@map("contact_messages")
+}
