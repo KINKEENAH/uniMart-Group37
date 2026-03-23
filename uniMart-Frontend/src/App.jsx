@@ -21,9 +21,10 @@ import SellerProfile from "./pages/sellerProfile";
 import AddProduct from "./pages/addProduct";
 function App() {
   const location = useLocation();
+  const hideNavbar = ["/signup", "/login", "/emailotp", "/loginotp"].includes(location.pathname);
   return (
     <>
-      <NavBar />
+      {!hideNavbar && <NavBar />}
       <AnimatePresence mode="wait">
         <Routes location={location} key={location.pathname}>
           <Route path="/" element={<Home />} />

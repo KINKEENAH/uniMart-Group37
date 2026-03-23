@@ -2,6 +2,8 @@ import { useNavigate } from "react-router-dom";
 import { useState } from "react";
 import { Eye, EyeOff } from "lucide-react";
 import { motion } from "framer-motion";
+import heroImage from "../../assets/Frame 8.png";
+import logo from "../../assets/UniMart.png";
 
 export default function SignUp() {
   const [fullName, setFullName] = useState("");
@@ -18,155 +20,147 @@ export default function SignUp() {
 
   const handleSignup = async () => {
     setError("");
-
-    if (!fullName || !studentId || !email || !password) {
+    if (!fullName || !studentId || !email || !password)
       return setError("All fields are required");
-    }
-    if (password !== confirmPassword) {
+    if (password !== confirmPassword)
       return setError("Passwords do not match");
-    }
-    if (!checked) {
+    if (!checked)
       return setError("You must agree to the terms");
-    }
 
     setLoading(true);
     try {
       const res = await fetch("/api/auth/signup", {
         method: "POST",
         headers: { "Content-Type": "application/json" },
-        body: JSON.stringify({
-          full_name: fullName,
-          student_id: studentId,
-          email,
-          password,
-        }),
+        body: JSON.stringify({ full_name: fullName, student_id: studentId, email, password }),
       });
-
       const data = await res.json();
-
-      if (!res.ok) {
-        return setError(data.message || "Signup failed");
-      }
-
-      // Pass user_id to OTP page via navigation state
+      if (!res.ok) return setError(data.message || "Signup failed");
       navigate("/emailotp", { state: { user_id: data.user_id, email } });
-    } catch (err) {
+    } catch {
       setError("Network error. Is the server running?");
     } finally {
       setLoading(false);
     }
   };
 
+  const inputClass =
+    "w-full px-4 py-3 rounded-lg border border-[#F5A623] placeholder-[#F5A623] text-sm outline-none focus:ring-2 focus:ring-[#F5A623]/40";
+
   return (
-    <section className="min-h-screen bg-white pt-20 pr-5">
-      <div className="flex flex-row min-h-screen">
-        {/* image section */}
-        <div className="hidden md:flex bg-[#D9D9D9] w-1/2 items-center justify-center">
-          <img src="" alt="" className="h-full w-full object-cover" />
+    <div className="flex min-h-screen">
+      {/* Left — image panel */}
+      <div className="hidden md:block w-1/2 bg-[#0D1B2A] relative overflow-hidden">
+        <img
+          src={heroImage}
+          alt="Shopping"
+          className="absolute bottom-0 left-0 w-full h-full object-cover object-top"
+        />
+      </div>
+
+      {/* Right — form panel */}
+      <div className="w-full md:w-1/2 bg-white flex flex-col justify-center px-12 py-12">
+        {/* Header */}
+        <div className="flex items-center justify-between mb-8">
+          <h1 className="text-2xl font-semibold text-gray-900">Sign Up</h1>
+          <img src={logo} alt="UniMart" className="h-7 object-contain" />
         </div>
 
-        {/* inputs section */}
-        <div className="md:w-1/2 bg-white flex flex-col justify-center px-10 py-12">
-          <div className="flex justify-between">
-            <h1 className="font-inter font-semibold text-2xl">Sign Up</h1>
-            <h1 className="flex justify-center font-nico text-xl">uniMart</h1>
+        {/* Fields */}
+        <div className="space-y-4">
+          <input
+            type="text"
+            placeholder="Full Name"
+            value={fullName}
+            onChange={(e) => setFullName(e.target.value)}
+            className={inputClass}
+          />
+          <input
+            type="text"
+            placeholder="Student ID"
+            value={studentId}
+            onChange={(e) => setStudentId(e.target.value)}
+            className={inputClass}
+          />
+          <div>
+            <input
+              type="email"
+              placeholder="Student Email"
+              value={email}
+              onChange={(e) => setEmail(e.target.value)}
+              className={inputClass}
+            />
+            <p className="text-xs text-gray-400 mt-1 pl-1">Use your personal or student email</p>
           </div>
 
-          <div className="space-y-4 mt-5 p-7">
-            <div>
-              <input
-                type="text"
-                placeholder="Full name"
-                value={fullName}
-                onChange={(e) => setFullName(e.target.value)}
-                className="border p-2 w-full rounded-xl placeholder:text-[#B9B9B9]"
-              />
-            </div>
-            <div>
-              <input
-                type="text"
-                placeholder="Student ID"
-                value={studentId}
-                onChange={(e) => setStudentId(e.target.value)}
-                className="border p-2 w-full rounded-xl placeholder:text-[#B9B9B9]"
-              />
-            </div>
-            <div>
-              <input
-                type="email"
-                placeholder="Student email"
-                value={email}
-                onChange={(e) => setEmail(e.target.value)}
-                className="border p-2 w-full rounded-xl placeholder:text-[#B9B9B9]"
-              />
-              <h3 className="text-[#515151] font-inter font-medium text-sm pt-2">
-                Use your personal or student email
-              </h3>
-            </div>
-            <div className="border p-2 w-full flex justify-between rounded-lg">
-              <input
-                type={showPassword ? "text" : "password"}
-                placeholder="Password"
-                value={password}
-                onChange={(e) => setPassword(e.target.value)}
-                className="outline-none border-none w-full placeholder:text-[#B9B9B9]"
-              />
-              <button onClick={() => setShowPassword(!showPassword)}>
-                {showPassword ? <EyeOff size={20} /> : <Eye size={20} />}
-              </button>
-            </div>
-            <div className="border p-2 w-full flex justify-between rounded-lg">
-              <input
-                type={showConfirmPassword ? "text" : "password"}
-                placeholder="Confirm Password"
-                value={confirmPassword}
-                onChange={(e) => setConfirmPassword(e.target.value)}
-                className="outline-none border-none w-full placeholder:text-[#B9B9B9]"
-              />
-              <button onClick={() => setShowConfirmPassword(!showConfirmPassword)}>
-                {showConfirmPassword ? <EyeOff size={20} /> : <Eye size={20} />}
-              </button>
-            </div>
-            <div>
-              <input
-                type="checkbox"
-                id="terms"
-                checked={checked}
-                onChange={(e) => setChecked(e.target.checked)}
-                className="cursor-pointer"
-              />
-              <label htmlFor="terms" className="pl-5 text-[#736E6E] font-inter font-normal text-sm">
-                I agree to all Terms, Privacy Policy and Fees
-              </label>
-            </div>
-
-            {error && <p className="text-red-500 text-sm">{error}</p>}
-          </div>
-
-          <div className="flex justify-center border bg-black rounded-xl mt-5 ml-9">
-            <button
-              onClick={handleSignup}
-              disabled={loading}
-              className="text-white p-3.5 cursor-pointer hover:text-gray-400 disabled:opacity-60 w-full"
-            >
-              {loading ? "Creating account..." : "Create Account"}
+          {/* Password */}
+          <div className="flex items-center border border-[#F5A623] rounded-lg px-4 py-3">
+            <input
+              type={showPassword ? "text" : "password"}
+              placeholder="Password"
+              value={password}
+              onChange={(e) => setPassword(e.target.value)}
+              className="flex-1 text-sm outline-none placeholder-[#F5A623]"
+            />
+            <button onClick={() => setShowPassword(!showPassword)} className="text-gray-400 ml-2">
+              {showPassword ? <EyeOff size={18} /> : <Eye size={18} />}
             </button>
           </div>
 
-          <div className="flex flex-row justify-center pt-3">
-            <h5 className="font-inter">Already have an account? </h5>
-            <motion.button
-              whileHover={{ scale: 1.05 }}
-              whileTap={{ scale: 0.95 }}
-              transition={{ duration: 0.5, ease: "easeOut" }}
-              onClick={() => navigate("/login")}
-              className="pl-1 cursor-pointer hover:text-blue-600 font-inter"
-            >
-              Login
-            </motion.button>
+          {/* Confirm Password */}
+          <div className="flex items-center border border-[#F5A623] rounded-lg px-4 py-3">
+            <input
+              type={showConfirmPassword ? "text" : "password"}
+              placeholder="Confirm Password"
+              value={confirmPassword}
+              onChange={(e) => setConfirmPassword(e.target.value)}
+              className="flex-1 text-sm outline-none placeholder-[#F5A623]"
+            />
+            <button onClick={() => setShowConfirmPassword(!showConfirmPassword)} className="text-gray-400 ml-2">
+              {showConfirmPassword ? <EyeOff size={18} /> : <Eye size={18} />}
+            </button>
           </div>
+
+          {/* Terms */}
+          <div className="flex items-center gap-3">
+            <input
+              type="checkbox"
+              id="terms"
+              checked={checked}
+              onChange={(e) => setChecked(e.target.checked)}
+              className="w-4 h-4 accent-[#F5A623] cursor-pointer"
+            />
+            <label htmlFor="terms" className="text-sm text-gray-500">
+              I agree to all{" "}
+              <span className="text-[#F5A623] cursor-pointer">Terms, Privacy Policy and Fees</span>
+            </label>
+          </div>
+
+          {error && <p className="text-red-500 text-sm">{error}</p>}
         </div>
+
+        {/* Submit */}
+        <motion.button
+          whileHover={{ scale: 1.02 }}
+          whileTap={{ scale: 0.98 }}
+          transition={{ duration: 0.2 }}
+          onClick={handleSignup}
+          disabled={loading}
+          className="mt-6 w-full bg-[#F5A623] text-white font-semibold py-3 rounded-lg text-sm disabled:opacity-60"
+        >
+          {loading ? "Creating account..." : "Create Account"}
+        </motion.button>
+
+        <p className="text-center text-sm text-gray-500 mt-4">
+          Already have an account?{" "}
+          <span
+            onClick={() => navigate("/login")}
+            className="text-[#F5A623] cursor-pointer hover:underline"
+          >
+            Log in
+          </span>
+        </p>
       </div>
-    </section>
+    </div>
   );
 }

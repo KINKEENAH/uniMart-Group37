@@ -2,22 +2,21 @@ import { useNavigate } from "react-router-dom";
 import { Eye, EyeOff } from "lucide-react";
 import { useState } from "react";
 import { motion } from "framer-motion";
+import loginImage from "../../assets/login.png";
+import logo from "../../assets/UniMart.png";
 
 export default function Login() {
   const [email, setEmail] = useState("");
   const [password, setPassword] = useState("");
   const [showPassword, setShowPassword] = useState(false);
+  const [rememberMe, setRememberMe] = useState(false);
   const [error, setError] = useState("");
   const [loading, setLoading] = useState(false);
   const navigate = useNavigate();
 
   const handleLogin = async () => {
     setError("");
-
-    if (!email || !password) {
-      return setError("Email and password are required");
-    }
-
+    if (!email || !password) return setError("Email and password are required");
     setLoading(true);
     try {
       const res = await fetch("/api/auth/login", {
@@ -25,93 +24,109 @@ export default function Login() {
         headers: { "Content-Type": "application/json" },
         body: JSON.stringify({ email, password }),
       });
-
       const data = await res.json();
-
       if (!res.ok) {
-        if (data.requires_verification) {
+        if (data.requires_verification)
           return navigate("/emailotp", { state: { user_id: data.user_id, email } });
-        }
         return setError(data.message || "Login failed");
       }
-
       navigate("/loginotp", { state: { user_id: data.user_id, email } });
-    } catch (err) {
+    } catch {
       setError("Network error. Is the server running?");
     } finally {
       setLoading(false);
     }
   };
 
+  const inputClass =
+    "w-full px-4 py-3 rounded-lg border border-[#F5A623] placeholder-[#F5A623] text-sm outline-none focus:ring-2 focus:ring-[#F5A623]/40";
+
   return (
-    <section className="pt-20 pr-5 min-h-screen bg-white">
-      <div className="flex flex-row min-h-screen">
-        <div className="hidden md:flex bg-[#D9D9D9] w-1/2 items-center justify-center">
-          <img src="" alt="" className="h-full w-full object-cover" />
+    <div className="flex min-h-screen">
+      {/* Left — image panel */}
+      <div className="hidden md:block w-1/2 bg-[#0D1B2A] relative overflow-hidden">
+        <img
+          src={loginImage}
+          alt="UniMart app"
+          className="absolute bottom-0 left-0 w-full h-full object-cover object-center"
+        />
+      </div>
+
+      {/* Right — form panel */}
+      <div className="w-full md:w-1/2 bg-white flex flex-col px-12 py-12">
+        {/* Header */}
+        <div className="flex items-center justify-between mb-12">
+          <h1 className="text-2xl font-semibold text-gray-900">Login</h1>
+          <img src={logo} alt="UniMart" className="h-7 object-contain" />
         </div>
 
-        <div className="md:w-1/2 bg-white flex flex-col justify-center px-10 py-12">
-          <div className="flex justify-between">
-            <h1 className="font-inter font-semibold text-2xl">Login</h1>
-            <h1 className="flex justify-center font-nico text-xl">uniMart</h1>
-          </div>
+        {/* Fields */}
+        <div className="space-y-4">
+          <input
+            type="email"
+            placeholder="Email"
+            value={email}
+            onChange={(e) => setEmail(e.target.value)}
+            className={inputClass}
+          />
 
-          <div className="space-y-4 mt-5 p-7">
-            <div>
-              <input
-                type="email"
-                placeholder="Student email"
-                value={email}
-                onChange={(e) => setEmail(e.target.value)}
-                className="border p-2 w-full rounded-xl placeholder:text-[#B9B9B9]"
-              />
-            </div>
-            <div className="border p-2 w-full flex justify-between rounded-lg">
-              <input
-                type={showPassword ? "text" : "password"}
-                placeholder="Password"
-                value={password}
-                onChange={(e) => setPassword(e.target.value)}
-                className="outline-none border-none w-full placeholder:text-[#B9B9B9]"
-              />
-              <button onClick={() => setShowPassword(!showPassword)}>
-                {showPassword ? <EyeOff size={20} /> : <Eye size={20} />}
-              </button>
-            </div>
-
-            <div className="flex flex-row justify-between">
-              <h3 className="cursor-pointer hover:text-blue-600 text-[#736E6E] font-inter font-normal text-sm">
-                Reset Password?
-              </h3>
-            </div>
-
-            {error && <p className="text-red-500 text-sm">{error}</p>}
-          </div>
-
-          <div className="flex justify-center border bg-black rounded-xl mt-5 ml-9">
-            <button
-              onClick={handleLogin}
-              disabled={loading}
-              className="text-white p-3.5 cursor-pointer hover:text-gray-400 disabled:opacity-60 w-full"
-            >
-              {loading ? "Logging in..." : "LOGIN"}
+          <div className="flex items-center border border-[#F5A623] rounded-lg px-4 py-3">
+            <input
+              type={showPassword ? "text" : "password"}
+              placeholder="Password"
+              value={password}
+              onChange={(e) => setPassword(e.target.value)}
+              className="flex-1 text-sm outline-none placeholder-[#F5A623]"
+            />
+            <button onClick={() => setShowPassword(!showPassword)} className="text-gray-400 ml-2">
+              {showPassword ? <EyeOff size={18} /> : <Eye size={18} />}
             </button>
           </div>
 
-          <div className="flex flex-row justify-center pt-3">
-            <h5 className="font-inter font-normal text-sm">Don't have an account yet? </h5>
-            <motion.button
-              whileHover={{ scale: 1.05 }}
-              whileTap={{ scale: 0.95 }}
-              transition={{ duration: 0.5, ease: "easeOut" }}
-              onClick={() => navigate("/signup")}
-              className="pl-1 cursor-pointer hover:text-blue-600 font-inter font-normal text-sm"
+          {/* Remember me + Reset */}
+          <div className="flex items-center justify-between">
+            <label className="flex items-center gap-2 text-sm text-gray-500 cursor-pointer">
+              <input
+                type="checkbox"
+                checked={rememberMe}
+                onChange={(e) => setRememberMe(e.target.checked)}
+                className="w-4 h-4 accent-[#F5A623]"
+              />
+              Remember me
+            </label>
+            <span
+              onClick={() => navigate("/resetpassword")}
+              className="text-sm text-gray-500 cursor-pointer hover:underline"
             >
-              Create your UniMart account
-            </motion.button>
+              Reset Password?
+            </span>
           </div>
+
+          {error && <p className="text-red-500 text-sm">{error}</p>}
         </div>
+
+        {/* Submit */}
+        <motion.button
+          whileHover={{ scale: 1.02 }}
+          whileTap={{ scale: 0.98 }}
+          transition={{ duration: 0.2 }}
+          onClick={handleLogin}
+          disabled={loading}
+          className="mt-6 w-full bg-[#F5A623] text-white font-semibold py-3 rounded-lg text-sm tracking-widest uppercase disabled:opacity-60"
+        >
+          {loading ? "Logging in..." : "Login"}
+        </motion.button>
+
+        <p className="text-center text-sm text-gray-500 mt-4">
+          Don't have an account yet?{" "}
+          <span
+            onClick={() => navigate("/signup")}
+            className="text-[#F5A623] cursor-pointer hover:underline"
+          >
+            Create your UniMart account
+          </span>
+        </p>
       </div>
-    </section>
+    </div>
   );
 }
