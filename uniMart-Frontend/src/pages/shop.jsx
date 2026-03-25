@@ -9,7 +9,7 @@ export default function Shop() {
       name: "Apple Watch Series 10",
       price: 350,
       oldPrice: 550,
-      image: "/images/watch.jpg",
+      image: "/images/Apple-watch.jpg",
       rating: 4.8,
       reviews: 324,
       description:
@@ -46,7 +46,7 @@ export default function Shop() {
     },
     {
       id: 3,
-      name: "Chennel Bag",
+      name: "Exotic Designer Shoulder bag",
       price: 350,
       oldPrice: 450,
       image: "/images/bag.jpg",
@@ -61,7 +61,7 @@ export default function Shop() {
         "Fashionable",
       ],
       seller: {
-        name: "Chennel Ltd",
+        name: "Exotic",
         location: "Accra Mall",
         sales: 1340,
         rating: 4.6,
@@ -96,7 +96,7 @@ export default function Shop() {
       name: "Cotton Tshirt",
       price: 40,
       oldPrice: 45,
-      image: "/images/tshirt.jpg",
+      image: "/images/shirts.jpg",
       rating: 4.5,
       reviews: 310,
       description: "Classy and comfortable wear for every outing",
@@ -116,13 +116,13 @@ export default function Shop() {
     },
     {
       id: 6,
-      name: "Chennel Bag",
+      name: "Ladies Tote Bag",
       price: 350,
       oldPrice: 450,
-      image: "/images/bag.jpg",
+      image: "/images/tote.jpg",
       rating: 4.5,
       reviews: 210,
-      description: "Elegant classic handbag for ladies",
+      description: "Classic handbag for Commuting and Daily Use",
       features: [
         "Lightweight",
         "Waterproof",
@@ -131,7 +131,7 @@ export default function Shop() {
         "Fashionable",
       ],
       seller: {
-        name: "Chennel Ltd",
+        name: "Ammy's Bags",
         location: "Accra Mall",
         sales: 1340,
         rating: 4.6,
@@ -140,7 +140,7 @@ export default function Shop() {
   ];
 
   return (
-    <div className="pt-8 px-6 md:px-16">
+    <div className="pt-24 px-6 md:px-16 pd-16 bg-[#dcd7c4]">
       <h1 className="text-3xl font-bold mb-6">Shop</h1>
 
       <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 gap-8">
@@ -148,18 +148,29 @@ export default function Shop() {
           <div
             key={product.id}
             className="border rounded-lg overflow-hidden shadow hover:shadow-lg cursor-pointer transition duration-200"
-            onClick={() => navigate("/productdetails", { state: product })}
           >
-            <div className="bg-gray-200 p-4 flex items-center justify-center">
+            <div
+              className="bg-gray-200 p-4 flex w-full  items-center justify-center"
+              onClick={() => navigate("/productdetails", { state: product })}
+            >
               <img
                 src={product.image}
                 alt={product.name}
-                className="h-48 object-cover rounded"
+                className="h-48 w-full object-cover rounded"
               />
             </div>
-            <div className="p-4">
+            <div className="p-4 bg-[#f8f7e9] ">
               <h3 className="text-lg font-semibold mb-2">{product.name}</h3>
-              <p className="text-gray-700 font-bold">₵{product.price}</p>
+              <p className="text-gray-700 font-bold mb-2">GH₵{product.price}</p>
+              <p className="text-gray-700 font-bold">👤{product.seller.name}</p>
+            </div>
+            <div className="grid place-items-center bg-[#f8f7e9] py-3">
+              <button
+                onClick={() => navigate("/viewcart")}
+                className="bg-[#f5ba25] text-center w-3/4 text-black px-16 py-3 rounded hover:bg-[#8d8793]"
+              >
+                Add to Cart
+              </button>
             </div>
           </div>
         ))}
