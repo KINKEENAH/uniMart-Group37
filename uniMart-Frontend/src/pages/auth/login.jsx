@@ -4,6 +4,7 @@ import { useState } from "react";
 import { motion } from "framer-motion";
 import loginImage from "../../assets/login.png";
 import logo from "../../assets/UniMart.png";
+import { useAuth } from "../../context/authContext";
 
 export default function Login() {
   const [email, setEmail] = useState("");
@@ -14,6 +15,7 @@ export default function Login() {
   const [loading, setLoading] = useState(false);
   const navigate = useNavigate();
   const location = useLocation();
+  const { login } = useAuth();
   const from = location.state?.from || "/";
 
   const handleLogin = async () => {
