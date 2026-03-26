@@ -1,57 +1,142 @@
-import { useEffect, useState } from "react";
 import { useNavigate, useLocation } from "react-router-dom";
-import { Star, MapPin, ShoppingCart, MessageCircle, Package } from "lucide-react";
-import { useCart } from "../context/cartContext";
-import { useAuth } from "../context/authContext";
 
 export default function ProductDetails() {
   const navigate = useNavigate();
-  const location = useLocation();
-  const { addToCart } = useCart();
-  const { isLoggedIn } = useAuth();
+  const { state: product } = useLocation();
 
-  const productId = location.state?.productId;
-  const [product, setProduct] = useState(null);
-  const [loading, setLoading] = useState(true);
-  const [error, setError] = useState("");
+  if (!product) {
+    return <p className="text-center mt-10">No product found</p>;
+  }
 
-  useEffect(() => {
-    if (!productId) { setError("No product selected."); setLoading(false); return; }
-    fetch(`/api/products/${productId}`)
-      .then((r) => r.json())
-      .then((data) => {
-        if (data.product) setProduct(data.product);
-        else setError(data.message || "Product not found");
-      })
-      .catch(() => setError("Network error."))
-      .finally(() => setLoading(false));
-  }, [productId]);
+  return (
+    <div className="pt-24 px-6 md:px-16">
+      {/* Top Breadcrumb & Cart */}
+      <div className="flex justify-between items-center mb-6">
+        <p className="text-sm text-gray-500">
+          <span
+            className="cursor-pointer hover:underline"
+            onClick={() => navigate("/")}
+          >
+            Home
+          </span>{" "}
+          &gt;{" "}
+          <span
+            className="cursor-pointer hover:underline"
+            onClick={() => navigate("/shop")}
+          >
+            Shop
+          </span>{" "}
+          &gt; {product.name}
+        </p>
 
-  const handleAddToCart = () => {
-    if (!isLoggedIn) { navigate("/login"); return; }
-    addToCart({
-      id: product.id,
-      name: product.title,
-      price: parseFloat(product.price),
-      image: product.images?.[0]?.image_url || null,
-      category: product.category?.name || "",
-      seller: { name: product.seller?.full_name || "—" },
-    });
-    navigate("/viewcart");
-  };
+        <button
+          onClick={() => navigate("/viewcart")}
+          className="bg-black text-white px-4 py-2 rounded hover:bg-gray-800"
+        >
+          View Cart
+        </button>
+      </div>
 
-  if (loading) return (
-    <div className="min-h-screen bg-[#F5F0E8] pt-16 flex items-center justify-center text-gray-400 text-sm">
-      Loading product...
-    </div>
-  );
+      {/* Main Layout */}
+      <div className="grid grid-cols-1 md:grid-cols-2 gap-10">
+        {/* LEFT: IMAGE */}
+        <div className="bg-gray-200 p-6 rounded-lg flex items-center justify-center">
+          <img
+            src={product.image}
+            alt={product.name}
+            className="w-full h-400px object-cover rounded-lg"
+          />
+        </div>
 
-  if (error || !product) return (
-    <div className="min-h-screen bg-[#F5F0E8] pt-16 flex flex-col items-center justify-center gap-4">
-      <p className="text-gray-500 text-sm">{error || "Product not found."}</p>
-      <button onClick={() => navigate("/shop")} className="text-[#F5A623] underline text-sm cursor-pointer">
-        Back to Shop
-      </button>
+        {/* RIGHT: DETAILS */}
+        <div className="flex flex-col">
+          {/* Product Name */}
+          <h1 className="text-3xl font-bold mb-2">{product.name}</h1>
+
+          {/* Rating & Stock */}
+          <p className="text-sm text-gray-600 mb-4">
+            ⭐ {product.rating || "4.5"} ({product.reviews || 100} reviews) • In
+            Stock
+          </p>
+
+          {/* Price */}
+          <div className="flex items-center gap-3 mb-6">
+            <span className="text-2xl font-bold">₵{product.price}</span>
+
+            {product.oldPrice && (
+              <>
+                <span className="line-through text-gray-400">
+                  ₵{product.oldPrice}
+                </span>
+
+                {/* Discount percentage */}
+                <span className="bg-gray-300 text-sm px-2 py-1 rounded">
+                  {Math.round(
+                    ((product.oldPrice - product.price) / product.oldPrice) *
+                      100,
+                  )}
+                  % OFF
+                </span>
+              </>
+            )}
+          </div>
+
+          {/* Description */}
+          <div className="mb-6">
+            <h2 className="font-semibold mb-2">Description</h2>
+            <p className="text-gray-600 text-sm">
+              {product.description ||
+                "No description available for this product."}
+            </p>
+          </div>
+
+          {/* Key Features */}
+          <div className="mb-6">
+            <h2 className="font-semibold mb-2">Key Features</h2>
+            <ul className="list-disc list-inside text-gray-600 text-sm">
+              {(
+                product.features || [
+                  "High performance",
+                  "Durable design",
+                  "User friendly",
+                ]
+              ).map((feature, index) => (
+                <li key={index}>{feature}</li>
+              ))}
+            </ul>
+          </div>
+
+          {/* Seller Info */}
+          <div className="bg-gray-100 p-4 rounded mb-6">
+            <p className="font-semibold">
+              {product.seller?.name || "John Doe"}
+            </p>
+            <p className="text-sm text-gray-600">
+              📍 {product.seller?.location || "KNUST Campus"}
+            </p>
+            <p className="text-sm text-gray-600">
+              ⭐ {product.seller?.rating || 4.7} •{" "}
+              {product.seller?.sales || 500} sales
+            </p>
+          </div>
+
+          {/* Buttons */}
+          <div className="flex gap-4">
+            <button
+              onClick={() => navigate("/viewcart")}
+              className="bg-black text-white px-6 py-3 rounded hover:bg-gray-800"
+            >
+              Add to Cart
+            </button>
+            <button
+              onClick={() => navigate("/chatseller")}
+              className="border border-black px-6 py-3 rounded hover:bg-gray-100"
+            >
+              Chat Seller
+            </button>
+          </div>
+        </div>
+      </div>
     </div>
   );
 
