@@ -1,294 +1,261 @@
-import React from "react";
+import { useState, useEffect, useCallback } from "react";
+import { useNavigate } from "react-router-dom";
 import {
-  FaUserCircle,
-  FaEnvelope,
-  FaPhone,
-  FaMapMarkerAlt,
-  FaGraduationCap,
-  FaHeart,
-  FaStar
-} from "react-icons/fa";
+  Mail, Phone, Calendar, GraduationCap, User, MapPin,
+  ShoppingBag, CreditCard, Heart, Star, Pencil, ShieldCheck, LogOut
+} from "lucide-react";
+import { useAuth } from "../context/authContext";
+import EditProfileModal from "../components/EditProfileModal";
 
-import { MdPayments } from "react-icons/md";
-import { IoCalendarOutline } from "react-icons/io5";
-import { FaBox } from "react-icons/fa6";
+const tabs = ["MY PURCHASES", "WISHLIST", "SAVED SELLERS"];
+const filters = ["ALL ORDERS", "DELIVERED", "PENDING"];
 
 export default function BuyerProfile() {
+  const navigate = useNavigate();
+  const { user, token, logout } = useAuth();
+  const [activeTab, setActiveTab] = useState("MY PURCHASES");
+  const [activeFilter, setActiveFilter] = useState("ALL ORDERS");
+  const [showEdit, setShowEdit] = useState(false);
+  const [orders, setOrders] = useState([]);
+  const [loadingOrders, setLoadingOrders] = useState(true);
+
+  const fetchOrders = useCallback(async () => {
+    if (!token) return;
+    setLoadingOrders(true);
+    try {
+      const res = await fetch("/api/orders/mine", {
+        headers: { Authorization: `Bearer ${token}` },
+      });
+      const data = await res.json();
+      if (res.ok) setOrders(data.orders);
+    } catch {}
+    finally { setLoadingOrders(false); }
+  }, [token]);
+
+  useEffect(() => { fetchOrders(); }, [fetchOrders]);
+
+  const name = user?.full_name?.toUpperCase() || "—";
+  const email = user?.email || "—";
+  const phone = user?.phone || "—";
+  const department = user?.department || "—";
+  const level = user?.level || "—";
+  const location = user?.campus_location || "—";
+  const studentSince = user?.student_since
+    ? new Date(user.student_since).getFullYear()
+    : user?.created_at
+    ? new Date(user.created_at).getFullYear()
+    : "—";
+  const totalOrders = orders.length;
+  const wishlistCount = user?._count?.wishlists ?? 0;
+
+  // Flatten orders into purchase rows (one row per order item)
+  const allPurchases = orders.flatMap((order) =>
+    order.order_items.map((item) => ({
+      id: item.id,
+      orderId: order.id,
+      name: item.product?.title || "Unknown Product",
+      seller: item.product?.seller_id || "—",
+      price: parseFloat(item.unit_price),
+      subtotal: parseFloat(item.subtotal),
+      quantity: item.quantity,
+      image: item.product?.images?.[0]?.image_url || null,
+      date: new Date(order.created_at).toLocaleDateString("en-GB", { day: "numeric", month: "short", year: "numeric" }),
+      payment: order.payment_method || "—",
+      location: order.meetup_location?.name || "—",
+      status: order.status,
+    }))
+  );
+
+  const filtered = allPurchases.filter((p) => {
+    if (activeFilter === "DELIVERED") return p.status === "delivered";
+    if (activeFilter === "PENDING") return p.status === "pending";
+    return true;
+  });
+
+  const totalSpent = orders.reduce((sum, o) => sum + parseFloat(o.total_amount), 0);
+
   return (
-    <div className="w-full bg-gray-100 min-h-screen p-4 pt-24 font-inter">
+    <div className="min-h-screen bg-[#F5F0E8] pt-16 pb-16">
+      {showEdit && <EditProfileModal onClose={() => setShowEdit(false)} />}
+      <div className="max-w-5xl mx-auto px-6 py-6 space-y-5">
 
-      {/* PROFILE HEADER */}
-      <div className="bg-white border">
+        {/* Profile Header */}
+        <div className="bg-white rounded-xl border border-gray-200 p-6">
+          <div className="flex flex-col md:flex-row justify-between gap-4">
+            <div className="flex gap-5 items-start">
+              {/* Avatar */}
+              <div className="relative shrink-0">
+                <div className="w-20 h-20 rounded-full bg-gray-200 flex items-center justify-center overflow-hidden">
+                  <User size={40} className="text-gray-400" />
+                </div>
+                <button className="absolute top-0 right-0 bg-white border border-gray-200 rounded-full p-1 cursor-pointer">
+                  <Pencil size={11} className="text-gray-500" />
+                </button>
+                <div className="absolute bottom-0 right-0 bg-blue-500 rounded-full p-1">
+                  <ShieldCheck size={11} className="text-white" />
+                </div>
+              </div>
 
-        <div className="flex flex-col md:flex-row justify-between p-6">
-
-          <div className="flex gap-4">
-
-            <FaUserCircle className="text-7xl text-gray-400"/>
-
-            <div>
-              <h2 className="font-bold text-xl">JORDAN WILLIAMS</h2>
-
-              <p className="text-sm text-gray-500">
-                Verified Student • 23 Purchases
-              </p>
-
-              <div className="grid grid-cols-1 md:grid-cols-3 gap-x-8 gap-y-2 mt-3 text-sm text-gray-600">
-
-                <span className="flex items-center gap-2">
-                  <FaEnvelope/> jordan.williams@st.knust.edu.gh
-                </span>
-
-                <span className="flex items-center gap-2">
-                  <FaPhone/> +1 (555) 987-6543
-                </span>
-
-                <span className="flex items-center gap-2">
-                  <IoCalendarOutline/> Student since 2026
-                </span>
-
-                <span className="flex items-center gap-2">
-                  <FaGraduationCap/> Business Administration
-                </span>
-
-                <span className="flex items-center gap-2">
-                  <FaStar/> Lvl 100
-                </span>
-
-                <span className="flex items-center gap-2">
-                  <FaMapMarkerAlt/> Main Campus, Brunei
-                </span>
-
+              <div>
+                <h1 className="text-xl font-bold text-gray-900">{name}</h1>
+                <div className="flex items-center gap-2 mt-1">
+                  <span className="flex items-center gap-1 text-sm text-[#F5A623] font-medium">
+                    <ShieldCheck size={14} /> {user?.is_verified ? "Verified Student" : "Unverified"}
+                  </span>
+                  <span className="text-sm text-gray-400">{totalOrders} Purchases</span>
+                </div>
+                <div className="grid grid-cols-1 md:grid-cols-3 gap-x-10 gap-y-2 mt-3 text-sm text-gray-500">
+                  <span className="flex items-center gap-2"><Mail size={13} /> {email}</span>
+                  <span className="flex items-center gap-2"><Phone size={13} /> {phone}</span>
+                  <span className="flex items-center gap-2"><Calendar size={13} /> Student since {studentSince}</span>
+                  <span className="flex items-center gap-2"><GraduationCap size={13} /> {department}</span>
+                  <span className="flex items-center gap-2"><User size={13} /> {level}</span>
+                  <span className="flex items-center gap-2"><MapPin size={13} /> {location}</span>
+                </div>
               </div>
             </div>
 
+            <div className="flex flex-col gap-2 items-end shrink-0">
+              <button onClick={() => setShowEdit(true)} className="flex items-center gap-2 bg-[#1A1A2E] text-white text-sm px-4 py-2 rounded-lg cursor-pointer hover:bg-[#2a2a4e] transition-colors">
+                <Pencil size={13} /> EDIT PROFILE
+              </button>
+              <button
+                onClick={() => navigate("/sellerprofile")}
+                className="flex items-center gap-2 bg-[#F5A623] text-white text-sm px-4 py-2 rounded-lg cursor-pointer hover:bg-[#e09610] transition-colors"
+              >
+                Switch to Seller Profile
+              </button>
+              <button
+                onClick={() => { logout(); navigate("/login"); }}
+                className="flex items-center gap-2 border border-red-300 text-red-500 text-sm px-4 py-2 rounded-lg cursor-pointer hover:bg-red-50 transition-colors"
+              >
+                <LogOut size={13} /> Logout
+              </button>
+            </div>
           </div>
-
-          <button className="border px-4 h-10 text-sm hover:bg-gray-900 cursor-pointer bg-black text-white">
-            EDIT PROFILE
-          </button>
-
-        </div>
-      </div>
-
-
-      {/* STATISTICS */}
-      <div className="grid grid-cols-2 md:grid-cols-4 text-center mt-4 border bg-white">
-
-        <div className="p-6 border-r border-b md:border-b-0">
-          <FaBox className="mx-auto text-gray-400 mb-2"/>
-          <h3 className="text-2xl font-bold">23</h3>
-          <p className="text-xs text-gray-500">TOTAL PURCHASES</p>
         </div>
 
-        <div className="p-6 border-r border-b md:border-b-0">
-          <MdPayments className="mx-auto text-gray-400 mb-2"/>
-          <h3 className="text-2xl font-bold">$1,845</h3>
-          <p className="text-xs text-gray-500">TOTAL SPENT</p>
+        {/* Stats */}
+        <div className="grid grid-cols-2 md:grid-cols-4 gap-4">
+          {[
+            { icon: ShoppingBag, value: String(totalOrders), label: "Total Purchases" },
+            { icon: CreditCard, value: `₵ ${totalSpent.toFixed(2)}`, label: "Total Spent" },
+            { icon: Heart, value: String(wishlistCount), label: "Wishlist Items" },
+            { icon: Star, value: "0", label: "Saved Sellers" },
+          ].map(({ icon: Icon, value, label }) => (
+            <div key={label} className="bg-white rounded-xl border border-gray-200 p-5">
+              <Icon size={20} className="text-[#F5A623] mb-3" />
+              <p className="text-2xl font-bold text-gray-900">{value}</p>
+              <p className="text-xs text-gray-400 mt-1">{label}</p>
+            </div>
+          ))}
         </div>
 
-        <div className="p-6 border-r">
-          <FaHeart className="mx-auto text-gray-400 mb-2"/>
-          <h3 className="text-2xl font-bold">12</h3>
-          <p className="text-xs text-gray-500">WISHLIST ITEMS</p>
-        </div>
-
-        <div className="p-6">
-          <FaStar className="mx-auto text-gray-400 mb-2"/>
-          <h3 className="text-2xl font-bold">8</h3>
-          <p className="text-xs text-gray-500">SAVED SELLERS</p>
-        </div>
-
-      </div>
-
-
-      {/* TABS */}
-      <div className="flex border mt-4 bg-white text-sm font-semibold">
-
-        <button className="flex-1 p-3 border-r bg-black text-white cursor-pointer hover:bg-gray-900">
-          MY PURCHASES
-        </button>
-
-        <button className="flex-1 p-3 border-r hover:bg-gray-100 cursor-pointer">
-          WISHLIST
-        </button>
-
-        <button className="flex-1 p-3 hover:bg-gray-100 cursor-pointer">
-          SAVED SELLERS
-        </button>
-
-      </div>
-
-
-      {/* PURCHASE SECTION */}
-      <div className="bg-white border p-6 mt-4">
-
-        <div className="flex flex-col md:flex-row md:justify-between md:items-center mb-4">
-
-          <h2 className="font-bold text-lg">MY PURCHASES</h2>
-
-          <div className="flex gap-2 mt-3 md:mt-0">
-
-            <button className="border px-3 py-1 text-xs hover:bg-gray-100 cursor-pointer">
-              ALL ORDERS
+        {/* Tabs */}
+        <div className="grid grid-cols-3 bg-white rounded-xl border border-gray-200 overflow-hidden">
+          {tabs.map((tab) => (
+            <button
+              key={tab}
+              onClick={() => setActiveTab(tab)}
+              className={`py-3 text-sm font-semibold cursor-pointer transition-colors border-r last:border-r-0 border-gray-200 ${
+                activeTab === tab ? "bg-white text-gray-900 border-b-2 border-b-gray-900" : "text-gray-400 hover:text-gray-600"
+              }`}
+            >
+              {tab}
             </button>
-
-            <button className="border px-3 py-1 text-xs hover:bg-gray-100 cursor-pointer">
-              DELIVERED
-            </button>
-
-            <button className="border px-3 py-1 text-xs hover:bg-gray-100 cursor-pointer">
-              PENDING
-            </button>
-
-          </div>
-
+          ))}
         </div>
 
-
-        {/* PURCHASE CARD */}
-        <div className="border p-4 mb-4 flex gap-4">
-
-          <div className="w-20 h-20 bg-gray-200"></div>
-
-          <div className="flex-1">
-
-            <h3 className="font-semibold">
-              Premium Wireless Headphones
-            </h3>
-
-            <p className="text-xs text-gray-500">
-              Seller: AudioTech Store
-            </p>
-
-            <p className="font-bold mt-1">$199.99</p>
-
-            <p className="text-xs text-gray-500">
-              Mar 5, 2026 • MTN Mobile Money • Student Union
-            </p>
-
-            <div className="flex flex-wrap gap-2 mt-3 text-xs">
-
-              <button className="bg-black text-white px-3 py-1 hover:bg-gray-800 cursor-pointer">
-                BUY AGAIN
-              </button>
-
-              <button className="border px-3 py-1 hover:bg-gray-100 cursor-pointer">
-                VIEW DETAILS
-              </button>
-
-              <button className="border px-3 py-1 hover:bg-gray-100 cursor-pointer">
-                CONTACT SELLER
-              </button>
-
-              <button className="border px-3 py-1 hover:bg-gray-100 cursor-pointer">
-               ⭐ LEAVE REVIEW
-              </button>
-
+        {/* Purchases Section */}
+        {activeTab === "MY PURCHASES" && (
+          <div>
+            <div className="flex items-center justify-between mb-4">
+              <h2 className="font-bold text-lg text-gray-900">MY PURCHASES</h2>
+              <div className="flex gap-2">
+                {filters.map((f) => (
+                  <button
+                    key={f}
+                    onClick={() => setActiveFilter(f)}
+                    className={`text-xs px-3 py-1.5 rounded-lg border cursor-pointer transition-colors ${
+                      activeFilter === f
+                        ? "bg-[#F5A623] text-white border-[#F5A623]"
+                        : "border-gray-300 text-gray-600 hover:border-gray-400"
+                    }`}
+                  >
+                    {f}
+                  </button>
+                ))}
+              </div>
             </div>
 
-          </div>
-
-          <span className="text-xs font-bold bg-black text-white px-2 py-1 h-fit">
-            DELIVERED
-          </span>
-
-        </div>
-
-
-        {/* SECOND CARD */}
-        <div className="border p-4 flex gap-4">
-
-          <div className="w-20 h-20 bg-gray-200"></div>
-
-          <div className="flex-1">
-
-            <h3 className="font-semibold">
-              Economics Textbook Bundle
-            </h3>
-
-            <p className="text-xs text-gray-500">
-              Seller: Sarah Johnson
-            </p>
-
-            <p className="font-bold mt-1">$85.00</p>
-
-            <p className="text-xs text-gray-500">
-              Mar 6, 2026 • Vodafone Cash • Main Gate
-            </p>
-
-            <div className="flex gap-2 mt-3 text-xs">
-
-              <button className="border px-3 py-1 hover:bg-gray-100 cursor-pointer">
-                VIEW DETAILS
-              </button>
-
-              <button className="border px-3 py-1 hover:bg-gray-100 cursor-pointer">
-                CONTACT SELLER
-              </button>
-
+            <div className="space-y-4">
+              {loadingOrders ? (
+                <p className="text-center text-sm text-gray-400 py-10">Loading purchases...</p>
+              ) : filtered.length === 0 ? (
+                <p className="text-center text-sm text-gray-400 py-10">No purchases found.</p>
+              ) : (
+                filtered.map((item) => (
+                <div key={item.id} className="bg-white rounded-xl border border-gray-200 p-4 flex gap-4">
+                  {item.image ? (
+                    <img src={item.image} alt={item.name} className="w-20 h-20 object-cover rounded-lg shrink-0" />
+                  ) : (
+                    <div className="w-20 h-20 bg-gray-100 rounded-lg shrink-0 flex items-center justify-center">
+                      <ShoppingBag size={24} className="text-gray-300" />
+                    </div>
+                  )}
+                  <div className="flex-1">
+                    <div className="flex justify-between items-start">
+                      <div>
+                        <h3 className="font-semibold text-gray-900 text-sm">{item.name}</h3>
+                        <p className="text-xs text-gray-400 mt-0.5">Order #{item.orderId.slice(0, 8).toUpperCase()}</p>
+                      </div>
+                      <span className={`text-xs font-semibold px-2 py-1 rounded border ${
+                        item.status === "delivered"
+                          ? "text-green-600 border-green-300 bg-green-50"
+                          : "text-orange-500 border-orange-300 bg-orange-50"
+                      }`}>
+                        {item.status.toUpperCase()}
+                      </span>
+                    </div>
+                    <div className="flex flex-wrap items-center gap-2 mt-2 text-xs text-gray-500">
+                      <span className="font-semibold text-gray-900">₵{item.price.toFixed(2)}</span>
+                      <span>•</span>
+                      <span className="flex items-center gap-1"><Calendar size={12} /> {item.date}</span>
+                      <span>•</span>
+                      <span className="flex items-center gap-1"><CreditCard size={12} /> {item.payment}</span>
+                      <span>•</span>
+                      <span className="flex items-center gap-1"><MapPin size={12} /> {item.location}</span>
+                    </div>
+                    <div className="flex flex-wrap gap-2 mt-3">
+                      {item.status === "delivered" && (
+                        <button className="bg-[#F5A623] text-white text-xs px-3 py-1.5 rounded-lg cursor-pointer hover:bg-[#e09610]">BUY AGAIN</button>
+                      )}
+                      <button className="border border-gray-300 text-xs px-3 py-1.5 rounded-lg cursor-pointer hover:bg-gray-50">VIEW DETAILS</button>
+                      <button className="border border-gray-300 text-xs px-3 py-1.5 rounded-lg cursor-pointer hover:bg-gray-50">CONTACT SELLER</button>
+                      {item.status === "delivered" && (
+                        <button className="border border-gray-300 text-xs px-3 py-1.5 rounded-lg cursor-pointer hover:bg-gray-50">LEAVE REVIEW</button>
+                      )}
+                    </div>
+                  </div>
+                </div>
+              ))
+              )}
             </div>
-
           </div>
+        )}
 
-          <span className="text-xs font-bold border px-2 py-1 h-fit">
-            PENDING
-          </span>
+        {activeTab === "WISHLIST" && (
+          <div className="bg-white rounded-xl border border-gray-200 p-10 text-center text-gray-400 text-sm">
+            Your wishlist is empty.
+          </div>
+        )}
 
-        </div>
-{/* THIRD PURCHASE */}
-<div className="border p-4 mt-4 flex gap-4">
-
-  <div className="w-20 h-20 bg-gray-200 flex items-center justify-center">
-    <FaBox className="text-gray-400"/>
-  </div>
-
-  <div className="flex-1">
-
-    <h3 className="font-semibold">
-      Laptop Stand Aluminum
-    </h3>
-
-    <p className="text-xs text-gray-500">
-      Seller: TechGear Campus
-    </p>
-
-    <p className="font-bold mt-1">
-      $49.99
-      <span className="text-xs text-gray-500 ml-2">
-        • Mar 3, 2026 • Cash • Library Entrance
-      </span>
-    </p>
-
-    <div className="flex flex-wrap gap-2 mt-3 text-xs">
-
-      <button className="bg-black text-white px-3 py-1 hover:bg-gray-800 cursor-pointer">
-        BUY AGAIN
-      </button>
-
-      <button className="border px-3 py-1 hover:bg-gray-100 cursor-pointer">
-        VIEW DETAILS
-      </button>
-
-      <button className="border px-3 py-1 hover:bg-gray-100 cursor-pointer">
-        CONTACT SELLER
-      </button>
-
-      <button className="border px-3 py-1 hover:bg-gray-100 cursor-pointer">
-        ⭐ LEAVE REVIEW
-      </button>
-
-    </div>
-
-  </div>
-
-  <span className="text-xs font-bold bg-black text-white px-2 py-1 h-fit">
-    DELIVERED
-  </span>
-
-</div>
+        {activeTab === "SAVED SELLERS" && (
+          <div className="bg-white rounded-xl border border-gray-200 p-10 text-center text-gray-400 text-sm">
+            No saved sellers yet.
+          </div>
+        )}
       </div>
-
     </div>
   );
 }

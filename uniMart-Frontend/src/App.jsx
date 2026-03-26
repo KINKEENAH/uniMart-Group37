@@ -1,6 +1,7 @@
 import { Routes, Route, useLocation } from "react-router-dom";
 import { AnimatePresence } from "framer-motion";
 import NavBar from "./components/navbar";
+import RequireAuth from "./components/RequireAuth";
 import "./App.css";
 import Home from "./pages/home";
 import Login from "./pages/auth/login";
@@ -19,30 +20,35 @@ import LoginOtp from "./pages/auth/loginotp";
 import SellerDash from "./pages/sellerDashboard";
 import SellerProfile from "./pages/sellerProfile";
 import AddProduct from "./pages/addProduct";
+
 function App() {
   const location = useLocation();
+  const hideNavbar = ["/signup", "/login"].includes(location.pathname);
   return (
     <>
-      <NavBar />
+      {!hideNavbar && <NavBar />}
       <AnimatePresence mode="wait">
         <Routes location={location} key={location.pathname}>
+          {/* Public */}
           <Route path="/" element={<Home />} />
           <Route path="/login" element={<Login />} />
           <Route path="/signup" element={<Signup />} />
+          <Route path="/emailotp" element={<EmailOtp />} />
+          <Route path="/loginotp" element={<LoginOtp />} />
           <Route path="/about" element={<AboutUs />} />
           <Route path="/contact" element={<ContactUs />} />
           <Route path="/shop" element={<Shop />} />
-          <Route path="/notification" element={<Notification />}></Route>
-          <Route path="/buyerprofile" element={<BuyerProfile />}></Route>
-          <Route path="/viewcart" element={<ViewCart />}></Route>
-          <Route path="/productdetails" element={<ProductDetails />}></Route>
-          <Route path="/chatseller" element={<ChatSeller />}></Route>
-          <Route path="/checkout" element={<Checkout />}></Route>
-          <Route path="/emailotp" element={<EmailOtp />}></Route>
-           <Route path="/loginotp" element={<LoginOtp />}></Route>
-           <Route path="/sellerdashboard" element={<SellerDash/>}></Route>
-           <Route path="/sellerprofile" element={<SellerProfile/>}/>
-        <Route path="/addproduct" element={<AddProduct/>}/>
+          <Route path="/productdetails" element={<ProductDetails />} />
+
+          {/* Protected */}
+          <Route path="/buyerprofile" element={<RequireAuth><BuyerProfile /></RequireAuth>} />
+          <Route path="/sellerprofile" element={<RequireAuth><SellerProfile /></RequireAuth>} />
+          <Route path="/addproduct" element={<RequireAuth><AddProduct /></RequireAuth>} />
+          <Route path="/viewcart" element={<RequireAuth><ViewCart /></RequireAuth>} />
+          <Route path="/checkout" element={<RequireAuth><Checkout /></RequireAuth>} />
+          <Route path="/notification" element={<RequireAuth><Notification /></RequireAuth>} />
+          <Route path="/chatseller" element={<RequireAuth><ChatSeller /></RequireAuth>} />
+          <Route path="/sellerdashboard" element={<RequireAuth><SellerDash /></RequireAuth>} />
         </Routes>
       </AnimatePresence>
     </>
