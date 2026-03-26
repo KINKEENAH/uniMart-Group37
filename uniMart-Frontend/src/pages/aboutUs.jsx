@@ -1,129 +1,94 @@
-import { Link } from "react-router-dom";
-import { FaMapMarkerAlt, FaPhone, FaEnvelope, FaClock } from "react-icons/fa";
+import { MapPin, Phone, Mail, Clock } from "lucide-react";
+
+const contactInfo = [
+  {
+    icon: MapPin,
+    label: "Location",
+    lines: ["Student Union Building", "Room 205, 2nd Floor", "University Campus"],
+  },
+  {
+    icon: Phone,
+    label: "Phone",
+    lines: ["(555) 123-4567", "Mon-Fri, 9 AM – 5 PM"],
+  },
+  {
+    icon: Mail,
+    label: "Email",
+    lines: ["support@campusmarket.edu", "24-48 hour response time"],
+  },
+  {
+    icon: Clock,
+    label: "Office Hours",
+    lines: ["Monday – Friday: 9 AM – 5 PM", "Saturday: 10 AM – 2 PM", "Sunday: Closed"],
+  },
+];
 
 export default function AboutUs() {
   return (
-    <div className="bg-gray-100 min-h-screen p-6 pt-24 font-inter">
+    <div className="min-h-screen bg-[#F5F0E8] pt-16 pb-16">
+      <div className="max-w-4xl mx-auto px-6 py-8 space-y-5">
 
-      {/* Header */}
-      <div className="mb-6">
-        <h1 className="text-2xl font-bold mb-2">ABOUT UniMart</h1>
-        <p className="text-gray-700 text-sm md:text-base">
-          Welcome to Campus Marketplace, your one-stop shop for buying and selling items on campus.
-        </p>
-      </div>
-
-      {/* Who We Are */}
-      <div className="border border-black p-5 mb-6 bg-white">
-        <h2 className="font-semibold mb-3">WHO WE ARE</h2>
-        <p className="text-sm text-gray-700">
-          UniMart is a platform designed to facilitate the buying and selling of items among students,
-          faculty, and staff on campus. Our mission is to provide a safe, convenient, and efficient
-          marketplace that enhances the campus community.
-        </p>
-      </div>
-
-      {/* How It Works */}
-      <div className="border border-black p-5 mb-6 bg-white">
-        <h2 className="font-semibold mb-3">HOW IT WORKS</h2>
-
-        <ol className="list-decimal ml-5 text-sm text-gray-700 space-y-1">
-          <li>
-            <span className="font-semibold">Browse and Search:</span> Use the search bar to find
-            items you're interested in. You can filter by category, price, and more.
-          </li>
-
-          <li>
-            <span className="font-semibold">Contact Sellers:</span> Once you find an item you like,
-            you can chat with the seller to ask questions or arrange a meet-up.
-          </li>
-
-          <li>
-            <span className="font-semibold">Meet and Exchange:</span> Meet the seller at a designated
-            campus location to exchange the item and complete the transaction.
-          </li>
-        </ol>
-      </div>
-
-      {/* Safety Tips */}
-      <div className="border border-black p-5 mb-6 bg-white">
-        <h2 className="font-semibold mb-3">SAFETY TIPS</h2>
-
-        <ul className="list-disc ml-5 text-sm text-gray-700 space-y-1">
-          <li>Always meet in public, well-lit areas on campus.</li>
-          <li>Bring a friend or someone you trust with you.</li>
-          <li>Check the seller's rating and reviews before meeting.</li>
-          <li>Be cautious with personal information and transactions.</li>
-        </ul>
-      </div>
-
-      {/* Contact Information */}
-      <div className="border border-black p-5 bg-white">
-
-        <h2 className="font-semibold mb-4">CONTACT INFORMATION</h2>
-
-        <div className="grid md:grid-cols-1 gap-6 text-sm text-gray-700">
-
-          {/* Location */}
-          <div className="flex gap-3 items-start">
-            <div className="bg-gray-200 p-2">
-              <FaMapMarkerAlt />
-            </div>
-
-            <div>
-              <p className="font-semibold">Location</p>
-              <p>Student Union Building</p>
-              <p>Room 205, 2nd Floor</p>
-              <p>University Campus</p>
-            </div>
-          </div>
-
-          {/* Phone */}
-          <div className="flex gap-3 items-start">
-            <div className="bg-gray-200 p-2">
-              <FaPhone />
-            </div>
-
-            <div>
-              <p className="font-semibold">Phone</p>
-              <p>(555) 123-4567</p>
-              <p>Mon–Fri, 9 AM – 5 PM</p>
-            </div>
-          </div>
-
-          {/* Email */}
-          <div className="flex gap-3 items-start">
-            <div className="bg-gray-200 p-2">
-              <FaEnvelope />
-            </div>
-
-            <div>
-              <p className="font-semibold">Email</p>
-              <p>support@campusmarket.edu</p>
-              <p>24–48 hrs response time</p>
-            </div>
-          </div>
-
-          {/* Office Hours */}
-          <div className="flex gap-3 items-start">
-            <div className="bg-gray-200 p-2">
-              <FaClock />
-            </div>
-
-            <div>
-              <p className="font-semibold">Office Hours</p>
-              <p>Monday – Friday: 9 AM – 5 PM</p>
-              <p>Saturday: 10 AM – 2 PM</p>
-              <p>Sunday: Closed</p>
-
-             
-            </div>
-          </div>
-
+        {/* Header */}
+        <div>
+          <h1 className="text-2xl font-bold text-gray-900 mb-1">ABOUT UniMart</h1>
+          <p className="text-sm text-gray-500">
+            Welcome to Campus Marketplace, your one-stop shop for buying and selling items on campus.
+          </p>
         </div>
 
-      </div>
+        {/* Who We Are */}
+        <div className="bg-white rounded-xl border border-gray-200 p-6">
+          <h2 className="font-bold text-sm text-gray-900 mb-3 tracking-wide">WHO WE ARE</h2>
+          <p className="text-sm text-gray-500 leading-relaxed">
+            UniMart is a platform designed to facilitate the buying and selling of items among students,
+            faculty, and staff on campus. Our mission is to provide a safe, convenient, and efficient
+            marketplace that enhances the campus community.
+          </p>
+        </div>
 
+        {/* How It Works */}
+        <div className="bg-white rounded-xl border border-gray-200 p-6">
+          <h2 className="font-bold text-sm text-gray-900 mb-3 tracking-wide">HOW IT WORKS</h2>
+          <div className="space-y-2 text-sm text-gray-500">
+            <p><span className="font-semibold text-gray-800">1. Browse and Search:</span> Use the search bar to find items you're interested in. You can filter by category, price, and more.</p>
+            <p><span className="font-semibold text-gray-800">2. Contact Sellers:</span> Once you find an item you like, you can chat with the seller to ask questions or arrange a meet-up.</p>
+            <p><span className="font-semibold text-gray-800">3. Meet and Exchange:</span> Meet the seller at a designated campus location to exchange the item and complete the transaction.</p>
+          </div>
+        </div>
+
+        {/* Safety Tips */}
+        <div className="bg-white rounded-xl border border-gray-200 p-6">
+          <h2 className="font-bold text-sm text-gray-900 mb-3 tracking-wide">SAFETY TIPS</h2>
+          <ul className="space-y-1 text-sm text-gray-500">
+            <li>Always meet in public, well-lit areas on campus.</li>
+            <li>Bring a friend or someone you trust with you.</li>
+            <li>Check the seller's rating and reviews before meeting.</li>
+            <li>Be cautious with personal information and transactions.</li>
+          </ul>
+        </div>
+
+        {/* Contact Information */}
+        <div className="bg-white rounded-xl border border-gray-200 p-6">
+          <h2 className="font-bold text-sm text-gray-900 mb-5 tracking-wide">CONTACT INFORMATION</h2>
+          <div className="space-y-5">
+            {contactInfo.map(({ icon: Icon, label, lines }) => (
+              <div key={label} className="flex gap-4 items-start">
+                <div className="w-9 h-9 rounded-lg bg-orange-50 border border-orange-100 flex items-center justify-center shrink-0">
+                  <Icon size={16} className="text-[#F5A623]" />
+                </div>
+                <div>
+                  <p className="text-sm font-semibold text-gray-800">{label}</p>
+                  {lines.map((line, i) => (
+                    <p key={i} className={`text-sm ${i === lines.length - 1 && label === "Email" ? "text-[#F5A623]" : "text-gray-500"}`}>
+                      {line}
+                    </p>
+                  ))}
+                </div>
+              </div>
+            ))}
+          </div>
+        </div>
+      </div>
     </div>
   );
 }
