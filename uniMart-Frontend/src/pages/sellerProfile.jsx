@@ -72,7 +72,7 @@ export default function SellerProfile() {
           }}
         />
       )}
-      <div className="max-w-5xl mx-auto px-6 py-6 space-y-5">
+      <div className="px-6 py-6 space-y-5">
 
         {/* Profile Header */}
         <div className="bg-white rounded-xl border border-gray-200 p-6">
