@@ -176,10 +176,5 @@ export default function Shop() {
         ))}
       </div>
     </div>
-<<<<<<< HEAD
   );
 }
-=======
-  )
-} 
->>>>>>> 9547f89031956221a3660be6b90c8487c01e232f
