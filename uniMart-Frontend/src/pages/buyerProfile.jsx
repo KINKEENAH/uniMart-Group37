@@ -2,9 +2,10 @@ import { useState, useEffect, useCallback } from "react";
 import { useNavigate } from "react-router-dom";
 import {
   Mail, Phone, Calendar, GraduationCap, User, MapPin,
-  ShoppingBag, CreditCard, Heart, Star, Pencil, ShieldCheck, LogOut
+  ShoppingBag, CreditCard, Heart, Star, Pencil, ShieldCheck, LogOut, Package
 } from "lucide-react";
 import { useAuth } from "../context/authContext";
+import { useWishlist } from "../context/wishlistContext";
 import EditProfileModal from "../components/EditProfileModal";
 
 const tabs = ["MY PURCHASES", "WISHLIST", "SAVED SELLERS"];
@@ -13,6 +14,9 @@ const filters = ["ALL ORDERS", "DELIVERED", "PENDING"];
 export default function BuyerProfile() {
   const navigate = useNavigate();
   const { user, token, logout } = useAuth();
+  const { wishlistIds, toggle: toggleWishlist } = useWishlist();
+  const [wishlistItems, setWishlistItems] = useState([]);
+  const [loadingWishlist, setLoadingWishlist] = useState(false);
   const [activeTab, setActiveTab] = useState("MY PURCHASES");
   const [activeFilter, setActiveFilter] = useState("ALL ORDERS");
   const [showEdit, setShowEdit] = useState(false);
@@ -34,6 +38,17 @@ export default function BuyerProfile() {
 
   useEffect(() => { fetchOrders(); }, [fetchOrders]);
 
+  // Fetch wishlist items when tab is opened
+  useEffect(() => {
+    if (activeTab !== "WISHLIST" || !token) return;
+    setLoadingWishlist(true);
+    fetch("/api/wishlists", { headers: { Authorization: `Bearer ${token}` } })
+      .then((r) => r.json())
+      .then((data) => { if (data.wishlists) setWishlistItems(data.wishlists); })
+      .catch(() => {})
+      .finally(() => setLoadingWishlist(false));
+  }, [activeTab, token]);
+
   const name = user?.full_name?.toUpperCase() || "—";
   const email = user?.email || "—";
   const phone = user?.phone || "—";
@@ -53,8 +68,10 @@ export default function BuyerProfile() {
     order.order_items.map((item) => ({
       id: item.id,
       orderId: order.id,
+      productId: item.product_id,
       name: item.product?.title || "Unknown Product",
-      seller: item.product?.seller_id || "—",
+      sellerId: item.product?.seller_id || null,
+      sellerName: item.product?.seller?.full_name || item.seller_id || "—",
       price: parseFloat(item.unit_price),
       subtotal: parseFloat(item.subtotal),
       quantity: item.quantity,
@@ -140,7 +157,7 @@ export default function BuyerProfile() {
           {[
             { icon: ShoppingBag, value: String(totalOrders), label: "Total Purchases" },
             { icon: CreditCard, value: `₵ ${totalSpent.toFixed(2)}`, label: "Total Spent" },
-            { icon: Heart, value: String(wishlistCount), label: "Wishlist Items" },
+            { icon: Heart, value: String(wishlistIds.size), label: "Wishlist Items" },
             { icon: Star, value: "0", label: "Saved Sellers" },
           ].map(({ icon: Icon, value, label }) => (
             <div key={label} className="bg-white rounded-xl border border-gray-200 p-5">
@@ -228,12 +245,12 @@ export default function BuyerProfile() {
                     </div>
                     <div className="flex flex-wrap gap-2 mt-3">
                       {item.status === "delivered" && (
-                        <button className="bg-[#F5A623] text-white text-xs px-3 py-1.5 rounded-lg cursor-pointer hover:bg-[#e09610]">BUY AGAIN</button>
+                        <button onClick={() => navigate("/shop")} className="bg-[#F5A623] text-white text-xs px-3 py-1.5 rounded-lg cursor-pointer hover:bg-[#e09610]">BUY AGAIN</button>
                       )}
-                      <button className="border border-gray-300 text-xs px-3 py-1.5 rounded-lg cursor-pointer hover:bg-gray-50">VIEW DETAILS</button>
-                      <button className="border border-gray-300 text-xs px-3 py-1.5 rounded-lg cursor-pointer hover:bg-gray-50">CONTACT SELLER</button>
+                      <button onClick={() => navigate("/productdetails", { state: { productId: item.productId } })} className="border border-gray-300 text-xs px-3 py-1.5 rounded-lg cursor-pointer hover:bg-gray-50">VIEW DETAILS</button>
+                      <button onClick={() => navigate("/chatseller", { state: { sellerId: item.sellerId, sellerName: item.sellerName } })} className="border border-gray-300 text-xs px-3 py-1.5 rounded-lg cursor-pointer hover:bg-gray-50">CONTACT SELLER</button>
                       {item.status === "delivered" && (
-                        <button className="border border-gray-300 text-xs px-3 py-1.5 rounded-lg cursor-pointer hover:bg-gray-50">LEAVE REVIEW</button>
+                        <button onClick={() => alert("Review feature coming soon!")} className="border border-gray-300 text-xs px-3 py-1.5 rounded-lg cursor-pointer hover:bg-gray-50">LEAVE REVIEW</button>
                       )}
                     </div>
                   </div>
@@ -245,8 +262,46 @@ export default function BuyerProfile() {
         )}
 
         {activeTab === "WISHLIST" && (
-          <div className="bg-white rounded-xl border border-gray-200 p-10 text-center text-gray-400 text-sm">
-            Your wishlist is empty.
+          <div>
+            <h2 className="font-bold text-lg text-gray-900 mb-4">WISHLIST</h2>
+            {loadingWishlist ? (
+              <p className="text-center text-sm text-gray-400 py-10">Loading wishlist...</p>
+            ) : wishlistItems.length === 0 ? (
+              <div className="bg-white rounded-xl border border-gray-200 p-10 text-center text-gray-400 text-sm">
+                Your wishlist is empty. Heart items in the shop to save them here.
+              </div>
+            ) : (
+              <div className="grid grid-cols-2 md:grid-cols-4 gap-4">
+                {wishlistItems.map((w) => {
+                  const p = w.product;
+                  return (
+                    <div key={w.id} className="bg-white rounded-xl border border-gray-200 overflow-hidden">
+                      {p.images?.[0]?.image_url ? (
+                        <img src={p.images[0].image_url} alt={p.title} className="w-full h-36 object-cover cursor-pointer" onClick={() => navigate("/productdetails", { state: { productId: p.id } })} />
+                      ) : (
+                        <div className="w-full h-36 bg-gray-100 flex items-center justify-center cursor-pointer" onClick={() => navigate("/productdetails", { state: { productId: p.id } })}>
+                          <Package size={28} className="text-gray-300" />
+                        </div>
+                      )}
+                      <div className="p-3">
+                        <p className="text-sm font-medium text-gray-900 truncate">{p.title}</p>
+                        <p className="text-sm font-semibold text-[#F5A623]">₵{parseFloat(p.price).toFixed(2)}</p>
+                        <p className="text-xs text-gray-400">{p.seller?.full_name}</p>
+                        <div className="flex gap-2 mt-2">
+                          <button onClick={() => navigate("/productdetails", { state: { productId: p.id } })} className="flex-1 bg-[#1A1A2E] text-white text-xs py-1.5 rounded-lg cursor-pointer hover:bg-[#2a2a4e]">View</button>
+                          <button
+                            onClick={() => { toggleWishlist(p.id); setWishlistItems((prev) => prev.filter((x) => x.product_id !== p.id)); }}
+                            className="p-1.5 text-red-400 hover:text-red-600 border border-red-200 rounded-lg cursor-pointer"
+                          >
+                            <Heart size={13} className="fill-red-400" />
+                          </button>
+                        </div>
+                      </div>
+                    </div>
+                  );
+                })}
+              </div>
+            )}
           </div>
         )}
 

@@ -106,7 +106,7 @@ export default function Login() {
               Remember me
             </label>
             <span
-              onClick={() => navigate("/resetpassword")}
+              onClick={() => navigate("/contact")}
               className="text-sm text-gray-500 cursor-pointer hover:underline"
             >
               Reset Password?

@@ -3,6 +3,7 @@ import { useNavigate } from "react-router-dom";
 import { Heart, SlidersHorizontal, User, ChevronLeft, ChevronRight, ShoppingCart, Check, Package } from "lucide-react";
 import { useCart } from "../context/cartContext";
 import { useAuth } from "../context/authContext";
+import { useWishlist } from "../context/wishlistContext";
 
 const categories = ["All", "Electronics", "Clothing", "Food", "Books", "Accessories", "Other"];
 const PER_PAGE = 8;
@@ -11,9 +12,9 @@ export default function Shop() {
   const navigate = useNavigate();
   const { addToCart } = useCart();
   const { isLoggedIn, token } = useAuth();
+  const { wishlistIds, toggle: toggleWishlist } = useWishlist();
 
   const [activeCategory, setActiveCategory] = useState("All");
-  const [liked, setLiked] = useState({});
   const [page, setPage] = useState(1);
   const [toast, setToast] = useState(null);
   const [products, setProducts] = useState([]);
@@ -53,7 +54,7 @@ export default function Shop() {
 
   const toggleLike = (id) => {
     if (!isLoggedIn) { navigate("/login"); return; }
-    setLiked((prev) => ({ ...prev, [id]: !prev[id] }));
+    toggleWishlist(id);
   };
 
   const totalPages = Math.ceil(products.length / PER_PAGE);
@@ -114,12 +115,12 @@ export default function Shop() {
                     <img
                       src={product.images[0].image_url}
                       alt={product.title}
-                      onClick={() => navigate("/productdetails", { state: { productId: product.id } })}
+                      onClick={() => navigate("/productdetails", { state: { productId: product.id, preview: { id: product.id, title: product.title, price: product.price, image: product.images?.[0]?.image_url || null } } })}
                       className="w-full h-40 object-cover cursor-pointer"
                     />
                   ) : (
                     <div
-                      onClick={() => navigate("/productdetails", { state: { productId: product.id } })}
+                      onClick={() => navigate("/productdetails", { state: { productId: product.id, preview: { id: product.id, title: product.title, price: product.price, image: product.images?.[0]?.image_url || null } } })}
                       className="w-full h-40 bg-gray-100 flex items-center justify-center cursor-pointer"
                     >
                       <Package size={32} className="text-gray-300" />
@@ -129,7 +130,7 @@ export default function Shop() {
                     onClick={() => toggleLike(product.id)}
                     className="absolute top-2 right-2 bg-white rounded-full p-1 shadow cursor-pointer"
                   >
-                    <Heart size={16} className={liked[product.id] ? "fill-[#F5A623] text-[#F5A623]" : "text-gray-400"} />
+                    <Heart size={16} className={wishlistIds.has(product.id) ? "fill-[#F5A623] text-[#F5A623]" : "text-gray-400"} />
                   </button>
                 </div>
 
