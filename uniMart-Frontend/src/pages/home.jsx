@@ -9,7 +9,7 @@ export default function Home() {
           <img
             src=""
             alt="Shopping"
-            className="md:h-130 md:w-170  rounded-full object-cover bg-gray-300 -ml-35 -mb-30"
+            className="md:h-130 md:w-170  rounded-full object-cover object-bottom bg-gray-300 -ml-35 -mb-30"
           />
         </div>
         <div className="">
@@ -34,7 +34,7 @@ export default function Home() {
               whileHover={{ scale: 1.05 }}
               whileTap={{ scale: 0.95 }}
               transition={{ duration: 0.5, ease: "easeOut" }}
-              onClick={() => navigate("/login")}
+              onClick={() => navigate("/sellerdashboard")}
               className="bg-[#515151] rounded-xl p-2 px-8  text-white font-inter"
             >
               Start Selling

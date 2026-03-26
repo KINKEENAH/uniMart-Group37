@@ -67,7 +67,7 @@ export default function ContactUs() {
             <div className="pt-5">
               <label>STUDENT ID (OPTIONAL)</label>
               <input
-                type="number"
+                type="text"
                 placeholder="Enter your student id"
                 className="border border-gray-300 p-2 w-full bg-[#B9B9B9]"
               ></input>
@@ -83,7 +83,7 @@ export default function ContactUs() {
             <div className="pt-5">
               <label>ORDER NUMBER (IF APPLICABLE)</label>
               <input
-                type="number"
+                type="text"
                 placeholder="e.g, #012345"
                 className="border border-gray-300  p-2 w-full bg-[#B9B9B9]"
               ></input>
