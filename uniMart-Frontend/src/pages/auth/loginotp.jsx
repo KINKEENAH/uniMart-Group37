@@ -14,7 +14,7 @@ export default function LoginOtp() {
   const navigate = useNavigate();
   const location = useLocation();
   const { login } = useAuth();
-  const { user_id, email } = location.state || {};
+  const { user_id, email, from } = location.state || {};
 
   const handleChange = (value, index) => {
     if (isNaN(value)) return;
@@ -43,7 +43,7 @@ export default function LoginOtp() {
       const data = await res.json();
       if (!res.ok) return setError(data.message || "Verification failed");
       login(data.user, data.token);
-      navigate("/shop");
+      navigate(location.state?.from || "/shop");
     } catch {
       setError("Network error. Is the server running?");
     } finally {

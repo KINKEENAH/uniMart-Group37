@@ -4,6 +4,7 @@ import { Eye, EyeOff } from "lucide-react";
 import { motion } from "framer-motion";
 import heroImage from "../../assets/Frame 8.png";
 import logo from "../../assets/UniMart.png";
+import { useAuth } from "../../context/authContext";
 
 export default function SignUp() {
   const [fullName, setFullName] = useState("");
@@ -17,6 +18,7 @@ export default function SignUp() {
   const [error, setError] = useState("");
   const [loading, setLoading] = useState(false);
   const navigate = useNavigate();
+  const { login } = useAuth();
 
   const handleSignup = async () => {
     setError("");
@@ -36,7 +38,8 @@ export default function SignUp() {
       });
       const data = await res.json();
       if (!res.ok) return setError(data.message || "Signup failed");
-      navigate("/emailotp", { state: { user_id: data.user_id, email } });
+      await login(data.user, data.token);
+      navigate("/shop");
     } catch {
       setError("Network error. Is the server running?");
     } finally {

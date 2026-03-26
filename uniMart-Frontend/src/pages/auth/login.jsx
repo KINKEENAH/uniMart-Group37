@@ -1,4 +1,4 @@
-import { useNavigate } from "react-router-dom";
+import { useNavigate, useLocation } from "react-router-dom";
 import { Eye, EyeOff } from "lucide-react";
 import { useState } from "react";
 import { motion } from "framer-motion";
@@ -13,6 +13,8 @@ export default function Login() {
   const [error, setError] = useState("");
   const [loading, setLoading] = useState(false);
   const navigate = useNavigate();
+  const location = useLocation();
+  const from = location.state?.from || "/";
 
   const handleLogin = async () => {
     setError("");
@@ -26,11 +28,10 @@ export default function Login() {
       });
       const data = await res.json();
       if (!res.ok) {
-        if (data.requires_verification)
-          return navigate("/emailotp", { state: { user_id: data.user_id, email } });
         return setError(data.message || "Login failed");
       }
-      navigate("/loginotp", { state: { user_id: data.user_id, email } });
+      await login(data.user, data.token);
+      navigate(from || "/shop");
     } catch {
       setError("Network error. Is the server running?");
     } finally {
@@ -56,7 +57,15 @@ export default function Login() {
       <div className="w-full md:w-1/2 bg-white flex flex-col px-12 py-12">
         {/* Header */}
         <div className="flex items-center justify-between mb-12">
-          <h1 className="text-2xl font-semibold text-gray-900">Login</h1>
+          <div>
+            <button
+              onClick={() => navigate("/")}
+              className="text-xs text-gray-400 hover:text-gray-600 cursor-pointer bg-transparent border-none mb-2 flex items-center gap-1"
+            >
+              ← Back to Home
+            </button>
+            <h1 className="text-2xl font-semibold text-gray-900">Login</h1>
+          </div>
           <img src={logo} alt="UniMart" className="h-7 object-contain" />
         </div>
 

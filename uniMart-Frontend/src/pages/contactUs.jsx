@@ -1,334 +1,191 @@
-import {
-  MapPin,
-  Phone,
-  Mail,
-  Clock,
-  MessageCircle,
-  CircleQuestionMark,
-} from "lucide-react";
 import { useState } from "react";
+import { MapPin, Phone, Mail, Clock, MessageCircle, HelpCircle, AlertTriangle } from "lucide-react";
+
+const faqs = [
+  {
+    q: "How do I report a problem with my order?",
+    a: 'Go to your order history, select the order, and click "Report Issue". You can also contact the seller directly through the chat feature or reach out to our support team using the form above.',
+  },
+  {
+    q: "What payment methods are accepted?",
+    a: "We accept Cash on Delivery and Mobile Money payments (MTN, Vodafone, AirtelTigo, and Telecel). Payment is typically completed when you meet the seller at the designated campus location.",
+  },
+  {
+    q: "How can I verify a seller?",
+    a: "Look for the verified shield icon next to the seller's name. Check their rating, number of sales, and student verification status. Always meet in public campus locations for safety.",
+  },
+  {
+    q: "What are the safe meet-up locations?",
+    a: "We recommend meeting at well-lit, public campus locations such as the Student Union, Library Entrance, Main Gate, or Cafeteria during daytime hours.",
+  },
+  {
+    q: "How do refunds work?",
+    a: "Refund policies are set by individual sellers. Contact the seller first to resolve any issues. If unresolved, our support team can mediate disputes between students.",
+  },
+  {
+    q: "Can I change my meet-up location?",
+    a: "Yes! Contact the seller through the chat to arrange a different campus meet-up location that works for both parties. Always confirm the new location before heading out.",
+  },
+];
+
+const inputClass =
+  "w-full bg-[#F5A623] placeholder-white text-white text-sm p-3 rounded outline-none focus:ring-2 focus:ring-white/40";
 
 export default function ContactUs() {
-  const [showPopup, setShowPopup] = useState(false);
-  const handlesend = () => {
-    setShowPopup(true);
-    setTimeout(() => setShowPopup(false), 3000);
+  const [form, setForm] = useState({ firstName: "", lastName: "", email: "", studentId: "", subject: "", orderNumber: "", message: "", agree: false });
+  const [sent, setSent] = useState(false);
+
+  const handleChange = (e) => {
+    const { name, value, type, checked } = e.target;
+    setForm((prev) => ({ ...prev, [name]: type === "checkbox" ? checked : value }));
+  };
+
+  const handleSend = () => {
+    setSent(true);
+    setTimeout(() => setSent(false), 3000);
   };
 
   return (
-    <section className="pt-20 p-5">
-      {/*main container div */}
-      <div className="flex flex-row gap-5">
-        <div>
-          <div className="">
-            <h1 className="text-4xl font-semibold leading-[-0.9] mb-2">
-              Contact Us{" "}
-            </h1>
-            <h6>
-              We're here to help! Reach out to us with any questions or
-              concerns.
-            </h6>
-          </div>
-          {/* */}
-          <div className="bg-[#D9D9D9]  mt-5 p-4 ">
-            <div className="p-4">
-              <h1 className="font-normal text-2xl">SEND US A MESSAGE</h1>
-            </div>
-            {/*Name label */}
-            <div className="flex flex-row gap-x-3">
-              <div>
-                <label>FIRST NAME *</label>
-                <input
-                  type="text"
-                  placeholder="Enter first name"
-                  onChange={(e) => setName(e.target.value)}
-                  className="border border-gray-300  p-2 w-full bg-[#B9B9B9]"
-                ></input>
+    <div className="min-h-screen bg-[#F5F0E8] pt-16 pb-16">
+      <div className="max-w-5xl mx-auto px-6 py-8">
+
+        {/* Page title */}
+        <h1 className="text-2xl font-bold text-gray-900 mb-1">CONTACT US</h1>
+        <p className="text-sm text-gray-500 mb-6">We're here to help! Reach out to us with any questions or concerns.</p>
+
+        <div className="flex flex-col lg:flex-row gap-6 items-start">
+
+          {/* Left — form */}
+          <div className="flex-1 bg-white rounded-xl border border-gray-200 p-6">
+            <h2 className="font-bold text-base text-gray-900 mb-5">SEND US A MESSAGE</h2>
+
+            <div className="space-y-4">
+              <div className="flex gap-3">
+                <div className="flex-1">
+                  <label className="text-xs text-gray-600 font-medium">FIRST NAME *</label>
+                  <input name="firstName" value={form.firstName} onChange={handleChange} placeholder="Enter first name" className={inputClass} />
+                </div>
+                <div className="flex-1">
+                  <label className="text-xs text-gray-600 font-medium">LAST NAME *</label>
+                  <input name="lastName" value={form.lastName} onChange={handleChange} placeholder="Enter last name" className={inputClass} />
+                </div>
               </div>
+
               <div>
-                <label>LAST NAME*</label>
-                <input
-                  type="text"
-                  placeholder="Enter last name"
-                  onChange={(e) => setName(e.target.value)}
-                  className="border border-gray-300  p-2 w-full bg-[#B9B9B9]"
-                ></input>
+                <label className="text-xs text-gray-600 font-medium">EMAIL ADDRESS *</label>
+                <input name="email" type="email" value={form.email} onChange={handleChange} placeholder="your.email@university.edu" className={inputClass} />
               </div>
-            </div>
-            {/*Email label */}
-            <div className="pt-5">
-              <label>EMAIL ADDRESS *</label>
-              <input
-                type="email"
-                placeholder="your.email@university.edu"
-                className="border border-gray-300  p-2 w-full bg-[#B9B9B9]"
-              ></input>
-            </div>
-            <div className="pt-5">
-              <label>STUDENT ID (OPTIONAL)</label>
-              <input
-                type="text"
-                placeholder="Enter your student id"
-                className="border border-gray-300 p-2 w-full bg-[#B9B9B9]"
-              ></input>
-            </div>
-            <div className="pt-5">
-              <label>SUBJECT *</label>
-              <input
-                type="text"
-                name="Subject"
-                className="border border-gray-300 rounded-md p-2 w-full bg-[#B9B9B9]"
-              ></input>
-            </div>
-            <div className="pt-5">
-              <label>ORDER NUMBER (IF APPLICABLE)</label>
-              <input
-                type="text"
-                placeholder="e.g, #012345"
-                className="border border-gray-300  p-2 w-full bg-[#B9B9B9]"
-              ></input>
-            </div>
-            <div className="pt-5">
-              <label>MESSAGE *</label>
-              <textarea
-                type="text"
-                placeholder="Please describe your issue or question in detail"
-                className="border p-3 w-full h-50 resize-none"
-              />
-            </div>
-            <p className=" text-center p-7">
-              I agree to receive follow-up emails regarding my inquiry and
-              understand that my information will be handled according to the
-              privacy policy.
-            </p>
-            <div className="flex justify-center border bg-black mb-4">
+
+              <div>
+                <label className="text-xs text-gray-600 font-medium">STUDENT ID (OPTIONAL)</label>
+                <input name="studentId" value={form.studentId} onChange={handleChange} placeholder="Enter your student ID" className={inputClass} />
+              </div>
+
+              <div>
+                <label className="text-xs text-gray-600 font-medium">SUBJECT *</label>
+                <input name="subject" value={form.subject} onChange={handleChange} className={inputClass} />
+              </div>
+
+              <div>
+                <label className="text-xs text-gray-600 font-medium">ORDER NUMBER (IF APPLICABLE)</label>
+                <input name="orderNumber" value={form.orderNumber} onChange={handleChange} placeholder="e.g. #12345" className={inputClass} />
+              </div>
+
+              <div>
+                <label className="text-xs text-gray-600 font-medium">MESSAGE *</label>
+                <textarea
+                  name="message"
+                  value={form.message}
+                  onChange={handleChange}
+                  placeholder="Please describe your issue or question in detail..."
+                  rows={5}
+                  className="w-full border border-gray-200 text-sm p-3 rounded-lg outline-none resize-none placeholder:text-gray-300 focus:border-[#F5A623] transition-colors"
+                />
+              </div>
+
+              <label className="flex items-start gap-2 text-xs text-gray-500 cursor-pointer">
+                <input type="checkbox" name="agree" checked={form.agree} onChange={handleChange} className="mt-0.5 accent-[#F5A623]" />
+                I agree to receive follow-up emails regarding my inquiry and understand that my information will be handled according to the privacy policy.
+              </label>
+
+              {sent && <p className="text-green-600 text-sm font-medium">✅ Message sent successfully!</p>}
+
               <button
-                onClick={handlesend}
-                className="text-white p-3.5 cursor-pointer hover:hover:text-gray-500 "
+                onClick={handleSend}
+                className="w-full bg-[#1A1A2E] text-white font-semibold py-3 rounded-lg text-sm hover:bg-[#2a2a4e] cursor-pointer transition-colors"
               >
                 SEND MESSAGE
               </button>
-              {showPopup && (
-                <div className="fixed top-16 text-white px-6 py-3 rounded-md shadow-lg">
-                  ✅ Message sent successfully!
-                </div>
-              )}
-            </div>
-          </div>
-        </div>
-        {/*second div */}
-        <div className=" ">
-          {/*Contact Information */}
-          <div className="bg-[#D9D9D9] mt-31 md:mt-25 p-5">
-            <div>
-              <h1 className="font-inter text-2xl tracking-wide text-[#0A0A0A]">
-                CAMPUS OFFICE
-              </h1>
-            </div>
-            <div className="flex flex-row pt-5 gap-3">
-              <div className="bg-[#515151] p-3 w-13 h-12">
-                <MapPin color="white" />
-              </div>
-              <div>
-                <div className="pb-1.5">
-                  <h1 className="text-lg text-[#0A0A0A] font-inter tracking-wide">
-                    Location
-                  </h1>
-                </div>
-                <h3 className="text-[#364153] tracking-wide">
-                  Student Union Building
-                </h3>
-                <h3 className="text-[#364153] tracking-wide">
-                  Room 205, 2nd Floor
-                </h3>
-                <h3 className="text-[#364153] tracking-wide">
-                  University Campus
-                </h3>
-              </div>
-            </div>
-            {/*phone */}
-            <div className="flex flex-row pt-5 gap-3">
-              <div className="bg-[#515151] p-3 w-13 h-12">
-                <Phone color="white" />
-              </div>
-              <div>
-                <div className="pb-1.5">
-                  <h1 className="text-lg text-[#0A0A0A] font-inter tracking-wide">
-                    Phone
-                  </h1>
-                </div>
-                <h3 className="text-[#364153] tracking-wide">(555) 123-4567</h3>
-                <h5 className="text-[#364153] tracking-wide">
-                  Mon-Fri, 9 AM - 5 PM
-                </h5>
-              </div>
-            </div>
-            {/*email */}
-            <div className="flex flex-row pt-5 gap-3">
-              <div className="bg-[#515151] p-3 w-13 h-12">
-                <Mail color="white" />
-              </div>
-              <div>
-                <div className="pb-1.5">
-                  <h1 className="text-lg text-[#0A0A0A] font-inter tracking-wide">
-                    Email
-                  </h1>
-                </div>
-                <h3 className="text-[#364153] tracking-wide">
-                  unimartsupport@gmail.com
-                </h3>
-                <h5 className="text-[#364153] tracking-wide">
-                  24 - 48 hour response time
-                </h5>
-              </div>
-            </div>
-            {/*office hours */}
-            <div className="flex flex-row pt-5 gap-3">
-              <div className="bg-[#515151] p-3 w-13 h-12">
-                <Clock color="white" />
-              </div>
-              <div>
-                <div className="pb-1.5">
-                  <h1 className="text-lg text-[#0A0A0A] font-inter tracking-wide">
-                    Office Hours
-                  </h1>
-                </div>
-                <h3 className="text-[#364153] tracking-wide">
-                  Monday - Friday: 9 AM - 5 PM
-                </h3>
-                <h3 className="text-[#364153] tracking-wide">
-                  Saturday: 10 AM - 2PM
-                </h3>
-                <h3 className="text-[#364153] tracking-wide">Sunday: Closed</h3>
-              </div>
             </div>
           </div>
 
-          {/*third div */}
+          {/* Right — info panels */}
+          <div className="lg:w-72 shrink-0 flex flex-col gap-4">
 
-          <div className="mt-5 bg-[#D9D9D9]  p-5">
-            <h1 className="font-inter font-medium text-lg text-[#0A0A0A]">
-              QUICK SUPPORT
-            </h1>
-            <div className="flex flex-col pt-4">
-              <div className="flex items-center justify-center gap-1 bg-black text-white   p-3  ">
-                <MessageCircle size={19} className="text-white " />
-                <button> Live Chat Support</button>
+            {/* Campus Office */}
+            <div className="bg-white rounded-xl border border-gray-200 p-5">
+              <h2 className="font-bold text-sm text-gray-900 mb-4 tracking-wide">CAMPUS OFFICE</h2>
+              <div className="space-y-4">
+                {[
+                  { icon: MapPin, label: "Location", lines: ["Student Union Building", "Room 205, 2nd Floor", "University Campus"] },
+                  { icon: Phone, label: "Phone", lines: ["(555) 123-4567", "Mon-Fri, 9 AM – 5 PM"] },
+                  { icon: Mail, label: "Email", lines: ["unimartsupport@gmail.com", "24-48 hour response time"] },
+                  { icon: Clock, label: "Office Hours", lines: ["Monday – Friday: 9 AM – 5 PM", "Saturday: 10 AM – 2 PM", "Sunday: Closed"] },
+                ].map(({ icon: Icon, label, lines }) => (
+                  <div key={label} className="flex gap-3 items-start">
+                    <div className="w-8 h-8 bg-gray-100 rounded-lg flex items-center justify-center shrink-0">
+                      <Icon size={14} className="text-gray-500" />
+                    </div>
+                    <div>
+                      <p className="text-sm font-semibold text-gray-800">{label}</p>
+                      {lines.map((l, i) => <p key={i} className="text-xs text-gray-500">{l}</p>)}
+                    </div>
+                  </div>
+                ))}
               </div>
-              <div className="bg-[white] border-2 mt-2 items-center flex flex-row gap-1 justify-center p-2.5">
-                <CircleQuestionMark size={20} />
+            </div>
+
+            {/* Quick Support */}
+            <div className="bg-white rounded-xl border border-gray-200 p-5">
+              <h2 className="font-bold text-sm text-gray-900 mb-3 tracking-wide">QUICK SUPPORT</h2>
+              <div className="flex flex-col gap-2">
+                <button className="flex items-center justify-center gap-2 bg-[#1A1A2E] text-white text-sm py-2.5 rounded-lg cursor-pointer hover:bg-[#2a2a4e] transition-colors">
+                  <MessageCircle size={15} /> Live Chat Support
+                </button>
                 <button
-                  onClick={() =>
-                    document
-                      .getElementById("faq")
-                      .scrollIntoView({ behavior: "smooth" })
-                  }
-                  className="text-black cursor-pointer hover:text-blue-800 "
+                  onClick={() => document.getElementById("faq").scrollIntoView({ behavior: "smooth" })}
+                  className="flex items-center justify-center gap-2 border border-gray-300 text-gray-700 text-sm py-2.5 rounded-lg cursor-pointer hover:bg-gray-50 transition-colors"
                 >
-                  View FAQ
+                  <HelpCircle size={15} /> View FAQ
                 </button>
               </div>
             </div>
-          </div>
-          <div className="border-[#99A1AF] bg-[#F9FAFB] border-2 p-3 mt-5">
-            <div>
-              <h1 className="text-[#0A0A0A] font-inter font-bold text-xl pb-2 tracking-normal">
-                📢Notice
-              </h1>
-            </div>
-            <h3 className="text-[#364153]">
-              During exam periods and holidays, response times may be <br />
-              longer. For urgent order issues, please contact the seller
-              directly through the chat feature.
-            </h3>
-          </div>
-        </div>
-      </div>
 
-      {/*FAQ */}
-      <div id="faq" className="">
-        <div className="mt-7 pb-6">
-          <h1 className="text-[#0A0A0A] font-medium text-xl font-inter">
-            FREQUENTLY ASKED QUESTIONS
-          </h1>
-        </div>
-        <div className="flex flex-row gap-4">
-          {/*first three */}
-          <div className="">
-            {/*1*/}
-            <div className="border-2 p-4 mb-5">
-              <h1 className="font-inter text-[#0A0A0A] font-medium text-lg pb-2.5">
-                How do i report a problem with my order?
-              </h1>
-              <h3 className="font-inter text-[#364153] text-md">
-                Go to your order history, select the order, and click "Report
-                Issue". You can also contact the seller directly through the
-                chat feature or reach out to our support team using the form
-                above.
-              </h3>
-            </div>
-            {/*2 */}
-            <div className="border-2 p-4 mb-5">
-              <h1 className="font-inter text-[#0A0A0A] font-medium text-lg pb-2.5">
-                How can I verify a seller?
-              </h1>
-              <h3 className="font-inter text-[#364153] text-md">
-                Look for the verified shield icon next to the seller's name.
-                Check their rating, number of sales, and student verification
-                status. Always meet in public campus locations for safety.
-              </h3>
-            </div>
-            {/*3 */}
-            <div className="border-2 p-4 mb-5">
-              <h1 className="font-inter text-[#0A0A0A] font-medium text-lg pb-2.5">
-                How do refunds work?
-              </h1>
-              <h3 className="font-inter text-[#364153] text-md">
-                Refund policies are set by individual sellers. Contact the
-                seller first to resolve any issues. If unresolved, our support
-                team can mediate disputes between students.
-              </h3>
+            {/* Notice */}
+            <div className="bg-gray-50 border border-gray-200 rounded-xl p-4">
+              <p className="flex items-center gap-1 text-xs font-bold text-gray-700 mb-1">
+                <AlertTriangle size={13} className="text-[#F5A623]" /> NOTICE
+              </p>
+              <p className="text-xs text-gray-500 leading-relaxed">
+                During exam periods and holidays, response times may be longer. For urgent order issues, please contact the seller directly through the chat feature.
+              </p>
             </div>
           </div>
-          {/*second three */}
-          <div>
-            {/*1 */}
-            <div className="border-2 p-4 mb-5">
-              <h1 className="font-inter text-[#0A0A0A] font-medium text-lg pb-2.5">
-                What payment methods are accepted?
-              </h1>
-              <h3 className="font-inter text-[#364153] text-md">
-                We accept Cash on Delivery and Mobile Money payments (MTN,
-                Vodafone, AirtelTigo, and Telecel). Payment is typically
-                completed when you meet the seller at the designated campus
-                location.
-              </h3>
-            </div>
-            {/*2 */}
-            <div className="border-2 p-4 mb-5 pb-10">
-              <h1 className="font-inter text-[#0A0A0A] font-medium text-lg pb-2.5">
-                What are the safe meet-up locations?
-              </h1>
-              <h3 className="font-inter text-[#364153] text-md">
-                We recommend meeting at well-lit, public campus locations such
-                as the Student Union, Library Entrance, Main Gate, or Cafeteria
-                during daytime hours.
-              </h3>
-            </div>
-            {/*3 */}
-            <div className="border-2 p-4 mb-5">
-              <h1 className="font-inter text-[#0A0A0A] font-medium text-lg pb-2.5">
-                Can I change my meet-up location?
-              </h1>
-              <h3 className="font-inter text-[#364153] text-md">
-                Yes! Contact the seller through the chat to arrange a different
-                campus meet-up location that works for both parties. Always
-                confirm the new location before heading out.
-              </h3>
-            </div>
+        </div>
+
+        {/* FAQ */}
+        <div id="faq" className="mt-10">
+          <h2 className="font-bold text-lg text-gray-900 mb-5">FREQUENTLY ASKED QUESTIONS</h2>
+          <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+            {faqs.map((faq) => (
+              <div key={faq.q} className="bg-white rounded-xl border border-gray-200 p-5">
+                <p className="text-sm font-semibold text-gray-900 mb-2">{faq.q}</p>
+                <p className="text-sm text-gray-500 leading-relaxed">{faq.a}</p>
+              </div>
+            ))}
           </div>
         </div>
       </div>
-    </section>
+    </div>
   );
 }

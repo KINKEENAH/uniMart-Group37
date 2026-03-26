@@ -1,6 +1,6 @@
 import { useState } from "react";
 import { useNavigate, useLocation } from "react-router-dom";
-import { Search, Heart, ShoppingCart, BellDot, User } from "lucide-react";
+import { Search, Heart, ShoppingCart, BellDot, User, MessageCircle } from "lucide-react";
 import { motion } from "framer-motion";
 import { useAuth } from "../context/authContext";
 import logo from "../assets/UniMart.png";
@@ -47,7 +47,13 @@ export default function Navbar() {
           <button className="cursor-pointer text-gray-300 hover:text-[#F5A623] transition-colors duration-200">
             <Search size={17} />
           </button>
-          <button className="cursor-pointer text-gray-300 hover:text-[#F5A623] transition-colors duration-200">
+          <button
+            onClick={() => navigate("/chatseller")}
+            className={`cursor-pointer text-gray-300 hover:text-[#F5A623] transition-colors duration-200 ${location.pathname === "/chatseller" ? "text-[#F5A623]" : ""}`}
+          >
+            <MessageCircle size={17} />
+          </button>
+          <button className="cursor-pointer text-gray-300 hover:text-[#F5A623] transition-colors duration-200" onClick={() => navigate("/buyerprofile")}>
             <Heart size={17} />
           </button>
           <button

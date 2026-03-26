@@ -1,9 +1,11 @@
 import { useNavigate } from "react-router-dom";
 import { motion } from "framer-motion";
 import heroImage from "../assets/Ellipse_1.png";
+import { useAuth } from "../context/authContext";
 
 export default function Home() {
   const navigate = useNavigate();
+  const { isLoggedIn } = useAuth();
   return (
     <section className="bg-[#0D1B2A] w-full min-h-screen flex items-center overflow-hidden">
       <div className="w-full flex flex-col md:flex-row items-stretch min-h-screen">
@@ -41,7 +43,7 @@ export default function Home() {
               whileHover={{ scale: 1.05 }}
               whileTap={{ scale: 0.95 }}
               transition={{ duration: 0.2 }}
-              onClick={() => navigate("/sellerdashboard")}
+              onClick={() => isLoggedIn ? navigate("/sellerprofile") : navigate("/login")}
               className="bg-[#F5A623] text-[#0D1B2A] font-bold rounded-full px-8 py-3 text-sm"
             >
               Start Selling
