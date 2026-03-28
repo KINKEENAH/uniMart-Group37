@@ -1,129 +1,92 @@
-import { useState } from "react";
+import { useState, useEffect, useCallback } from "react";
 import { useNavigate } from "react-router-dom";
-import { Filter, Trash2, Check, Bell, MessageSquare, ShoppingBag, Tag, Send, X } from "lucide-react";
-
-const initialNotifications = [
-  {
-    id: 1,
-    type: "order",
-    title: "Order Confirmed",
-    isNew: true,
-    message: "Your order #12345 for Premium Wireless Headphones has been confirmed. The seller will contact you shortly to arrange meet-up at Student Union.",
-    extra: "Order Total: ₵199.99",
-    time: "2 minutes ago",
-    read: false,
-    actions: ["View Order", "Contact Seller"],
-  },
-  {
-    id: 2,
-    type: "message",
-    title: "New Message from AudioTech Store",
-    isNew: true,
-    message: '"Hi! I can meet you tomorrow at 3 PM at the Student Union. I\'ll bring the headphones and the original packaging. See you then!"',
-    time: "15 minutes ago",
-    read: false,
-    actions: ["Reply", "View Chat"],
-  },
-  {
-    id: 3,
-    type: "order",
-    title: "Payment Reminder",
-    isNew: true,
-    message: "Please complete payment for order #12345 when you meet the seller. Remember to bring exact cash or have your Mobile Money ready.",
-    time: "1 hour ago",
-    read: false,
-    actions: [],
-  },
-  {
-    id: 4,
-    type: "order",
-    title: "Order Delivered",
-    isNew: false,
-    message: "Your order #12340 for Laptop Stand Aluminum has been successfully delivered. Thank you for shopping with us!",
-    time: "Yesterday, 6:30 PM",
-    read: true,
-    actions: [],
-  },
-  {
-    id: 5,
-    type: "message",
-    title: "New Message from TechGear Campus",
-    isNew: false,
-    message: '"Thanks for your purchase! Hope you enjoy the laptop stand."',
-    time: "March 5, 2:15 PM",
-    read: true,
-    actions: [],
-  },
-  {
-    id: 6,
-    type: "promo",
-    title: "Spring Sale - 20% Off Electronics",
-    isNew: false,
-    message: "Limited time offer! Get 20% off all electronics this week. Browse our latest collection of laptops, headphones, and accessories.",
-    time: "March 3, 9:00 AM",
-    read: true,
-    actions: ["Shop Now"],
-  },
-];
+import { Filter, Trash2, Check, Bell, MessageSquare, ShoppingBag, Tag, ChevronLeft, ChevronRight } from "lucide-react";
+import { useAuth } from "../context/authContext";
 
 const tabs = ["ALL", "ORDERS", "MESSAGES", "SYSTEM"];
+const PER_PAGE = 6;
+
+function timeAgo(dateStr) {
+  const diff = Date.now() - new Date(dateStr).getTime();
+  const mins = Math.floor(diff / 60000);
+  if (mins < 1) return "Just now";
+  if (mins < 60) return `${mins} minute${mins > 1 ? "s" : ""} ago`;
+  const hrs = Math.floor(mins / 60);
+  if (hrs < 24) return `${hrs} hour${hrs > 1 ? "s" : ""} ago`;
+  const days = Math.floor(hrs / 24);
+  return `${days} day${days > 1 ? "s" : ""} ago`;
+}
 
 const iconMap = {
   order: <ShoppingBag size={18} />,
   message: <MessageSquare size={18} />,
   promo: <Tag size={18} />,
+  system: <Bell size={18} />,
 };
 
 export default function Notification() {
-  const [activeTab, setActiveTab] = useState("ALL");
-  const [notifs, setNotifs] = useState(initialNotifications);
-  const [currentPage, setCurrentPage] = useState(1);
-  const [replyingTo, setReplyingTo] = useState(null);
-  const [replyText, setReplyText] = useState("");
   const navigate = useNavigate();
+  const { token } = useAuth();
+  const [activeTab, setActiveTab] = useState("ALL");
+  const [notifs, setNotifs] = useState([]);
+  const [loading, setLoading] = useState(true);
+  const [currentPage, setCurrentPage] = useState(1);
 
-  const filtered = activeTab === "ALL"
-    ? notifs
-    : notifs.filter(n => {
-        if (activeTab === "ORDERS") return n.type === "order";
-        if (activeTab === "MESSAGES") return n.type === "message";
-        if (activeTab === "SYSTEM") return n.type === "promo";
-        return true;
+  const fetchNotifs = useCallback(async () => {
+    if (!token) return;
+    setLoading(true);
+    try {
+      const res = await fetch("/api/notifications", {
+        headers: { Authorization: `Bearer ${token}` },
       });
+      const data = await res.json();
+      if (res.ok) setNotifs(data.notifications);
+    } catch {}
+    finally { setLoading(false); }
+  }, [token]);
 
-  const unreadCount = notifs.filter(n => !n.read).length;
+  useEffect(() => { fetchNotifs(); }, [fetchNotifs]);
 
-  const markAllRead = () => {
-    setNotifs(notifs.map(n => ({ ...n, read: true, isNew: false })));
+  const markRead = async (id) => {
+    setNotifs((prev) => prev.map((n) => n.id === id ? { ...n, is_read: true } : n));
+    await fetch(`/api/notifications/${id}/read`, {
+      method: "PATCH",
+      headers: { Authorization: `Bearer ${token}` },
+    }).catch(() => {});
   };
 
-  const deleteNotif = (id) => {
-    setNotifs(notifs.filter(n => n.id !== id));
+  const deleteNotif = async (id) => {
+    setNotifs((prev) => prev.filter((n) => n.id !== id));
+    await fetch(`/api/notifications/${id}`, {
+      method: "DELETE",
+      headers: { Authorization: `Bearer ${token}` },
+    }).catch(() => {});
   };
 
-  const markRead = (id) => {
-    setNotifs(notifs.map(n => n.id === id ? { ...n, read: true, isNew: false } : n));
-  };
-
-  const handleReply = (notifId) => {
-    setReplyingTo(notifId);
-    setReplyText("");
-  };
-
-  const sendReply = () => {
-    if (!replyText.trim()) return;
-    console.log("Reply sent:", replyText);
-    setReplyingTo(null);
-    setReplyText("");
-    navigate("/chatseller");
+  const markAllRead = async () => {
+    setNotifs((prev) => prev.map((n) => ({ ...n, is_read: true })));
+    await fetch("/api/notifications/read-all", {
+      method: "PATCH",
+      headers: { Authorization: `Bearer ${token}` },
+    }).catch(() => {});
   };
 
   const handleAction = (action) => {
-    if (action === "View Order") navigate("/viewcart");
-    if (action === "Contact Seller") navigate("/chatseller");
-    if (action === "View Chat") navigate("/chatseller");
+    if (action === "View Order") navigate("/buyerprofile");
+    if (action === "Contact Seller" || action === "View Chat" || action === "Reply") navigate("/chatseller");
     if (action === "Shop Now") navigate("/shop");
   };
+
+  const filtered = notifs.filter((n) => {
+    if (activeTab === "ORDERS") return n.type === "order";
+    if (activeTab === "MESSAGES") return n.type === "message";
+    if (activeTab === "SYSTEM") return n.type === "system" || n.type === "promo";
+    return true;
+  });
+
+  const unreadCount = notifs.filter((n) => !n.is_read).length;
+  const totalPages = Math.ceil(filtered.length / PER_PAGE);
+  const paginated = filtered.slice((currentPage - 1) * PER_PAGE, currentPage * PER_PAGE);
 
   return (
     <section className="min-h-screen bg-[#F5F0E8] pt-16 pb-16">
@@ -140,13 +103,10 @@ export default function Notification() {
             )}
           </div>
           <div className="flex gap-2">
-            <button className="flex items-center gap-2 border border-gray-300 bg-white px-4 py-2 rounded-lg text-sm text-gray-600 hover:bg-gray-50 cursor-pointer">
+            <button className="flex items-center gap-2 border border-gray-300 bg-white px-4 py-2 rounded-lg text-sm text-gray-600 hover:bg-gray-50 cursor-pointer" onClick={() => setActiveTab("ALL")}>
               <Filter size={14} /> Filter
             </button>
-            <button
-              onClick={markAllRead}
-              className="border border-gray-300 bg-white px-4 py-2 rounded-lg text-sm text-gray-600 hover:bg-gray-50 cursor-pointer"
-            >
+            <button onClick={markAllRead} className="border border-gray-300 bg-white px-4 py-2 rounded-lg text-sm text-gray-600 hover:bg-gray-50 cursor-pointer">
               Mark All Read
             </button>
           </div>
@@ -154,14 +114,12 @@ export default function Notification() {
 
         {/* Tabs */}
         <div className="flex gap-8 border-b border-gray-200 mb-5">
-          {tabs.map(tab => (
+          {tabs.map((tab) => (
             <button
               key={tab}
-              onClick={() => setActiveTab(tab)}
+              onClick={() => { setActiveTab(tab); setCurrentPage(1); }}
               className={`pb-3 text-sm font-semibold cursor-pointer transition-colors ${
-                activeTab === tab
-                  ? "border-b-2 border-gray-900 text-gray-900"
-                  : "text-gray-400 hover:text-gray-600"
+                activeTab === tab ? "border-b-2 border-gray-900 text-gray-900" : "text-gray-400 hover:text-gray-600"
               }`}
             >
               {tab}
@@ -169,141 +127,109 @@ export default function Notification() {
           ))}
         </div>
 
-        {/* Notification list */}
-        <div className="flex flex-col gap-3">
-          {filtered.map(notif => (
-            <div
-              key={notif.id}
-              className={`rounded-xl border p-4 flex gap-4 transition-all ${
-                notif.read ? "bg-gray-50 border-gray-200 opacity-70" : "bg-white border-gray-200"
-              }`}
-            >
-              {/* Icon */}
-              <div className={`w-10 h-10 rounded-full flex items-center justify-center shrink-0 ${
-                notif.read ? "bg-gray-200 text-gray-400" : "bg-gray-100 text-gray-600"
-              }`}>
-                {iconMap[notif.type]}
-              </div>
-
-              <div className="flex-1 min-w-0">
-                <div className="flex justify-between items-start gap-2">
-                  <div className="flex items-center gap-2 flex-wrap">
-                    <h3 className={`text-sm font-semibold ${notif.read ? "text-gray-400" : "text-gray-900"}`}>
-                      {notif.title}
-                    </h3>
-                    {notif.isNew && (
-                      <span className="bg-[#F5A623] text-white text-xs font-semibold px-2 py-0.5 rounded">
-                        NEW
-                      </span>
-                    )}
-                  </div>
-                  {/* Mark read / delete */}
-                  <div className="flex items-center gap-1 shrink-0">
-                    <button
-                      onClick={() => markRead(notif.id)}
-                      className={`w-7 h-7 flex items-center justify-center rounded cursor-pointer transition-colors ${
-                        notif.read ? "bg-gray-200 text-gray-400" : "bg-green-500 text-white hover:bg-green-600"
-                      }`}
-                    >
-                      <Check size={13} />
-                    </button>
-                    <button
-                      onClick={() => deleteNotif(notif.id)}
-                      className="w-7 h-7 flex items-center justify-center rounded bg-red-500 text-white hover:bg-red-600 cursor-pointer transition-colors"
-                    >
-                      <Trash2 size={13} />
-                    </button>
-                  </div>
+        {/* List */}
+        {loading ? (
+          <p className="text-center text-sm text-gray-400 py-20">Loading notifications...</p>
+        ) : paginated.length === 0 ? (
+          <div className="bg-white rounded-xl border border-gray-200 p-12 text-center text-gray-400 text-sm">
+            No notifications yet.
+          </div>
+        ) : (
+          <div className="flex flex-col gap-3">
+            {paginated.map((notif) => (
+              <div
+                key={notif.id}
+                className={`rounded-xl border p-4 flex gap-4 transition-all ${
+                  notif.is_read ? "bg-gray-50 border-gray-200 opacity-70" : "bg-white border-gray-200"
+                }`}
+              >
+                {/* Icon */}
+                <div className={`w-10 h-10 rounded-full flex items-center justify-center shrink-0 ${
+                  notif.is_read ? "bg-gray-200 text-gray-400" : "bg-gray-100 text-gray-600"
+                }`}>
+                  {iconMap[notif.type] || <Bell size={18} />}
                 </div>
 
-                <p className={`text-sm mt-1 leading-relaxed ${notif.read ? "text-gray-400" : "text-gray-600"}`}>
-                  {notif.message}
-                </p>
-
-                {notif.extra && (
-                  <p className="text-xs font-semibold text-gray-700 mt-1">{notif.extra}</p>
-                )}
-
-                <p className="text-xs text-gray-400 mt-1">{notif.time}</p>
-
-                {/* Action buttons */}
-                {notif.actions.length > 0 && (
-                  <div className="flex gap-2 mt-3 flex-wrap">
-                    {notif.actions.map(action => (
+                <div className="flex-1 min-w-0">
+                  <div className="flex justify-between items-start gap-2">
+                    <div className="flex items-center gap-2 flex-wrap">
+                      <h3 className={`text-sm font-semibold ${notif.is_read ? "text-gray-400" : "text-gray-900"}`}>
+                        {notif.title}
+                      </h3>
+                      {!notif.is_read && (
+                        <span className="bg-[#F5A623] text-white text-xs font-semibold px-2 py-0.5 rounded">NEW</span>
+                      )}
+                    </div>
+                    <div className="flex items-center gap-1 shrink-0">
                       <button
-                        key={action}
-                        onClick={() => action === "Reply" ? handleReply(notif.id) : handleAction(action)}
-                        className={`px-4 py-1.5 text-xs rounded-lg cursor-pointer transition-colors font-medium ${
-                          action === "View Order" || action === "Reply" || action === "Shop Now"
-                            ? "bg-[#1A1A2E] text-white hover:bg-[#2a2a4e]"
-                            : "border border-gray-300 text-gray-600 hover:bg-gray-50"
+                        onClick={() => markRead(notif.id)}
+                        className={`w-7 h-7 flex items-center justify-center rounded cursor-pointer transition-colors ${
+                          notif.is_read ? "bg-gray-200 text-gray-400" : "bg-green-500 text-white hover:bg-green-600"
                         }`}
                       >
-                        {action}
+                        <Check size={13} />
                       </button>
-                    ))}
-                  </div>
-                )}
-
-                {/* Reply box */}
-                {replyingTo === notif.id && (
-                  <div className="mt-3 border border-gray-200 rounded-lg p-3 bg-gray-50">
-                    <div className="flex justify-between items-center mb-2">
-                      <p className="text-xs text-gray-500 font-medium">Reply to message</p>
-                      <button onClick={() => setReplyingTo(null)} className="cursor-pointer">
-                        <X size={14} className="text-gray-400 hover:text-gray-600" />
-                      </button>
-                    </div>
-                    <textarea
-                      value={replyText}
-                      onChange={(e) => setReplyText(e.target.value)}
-                      placeholder="Type your reply..."
-                      rows={3}
-                      className="w-full border border-gray-200 rounded-lg p-2 text-xs outline-none resize-none placeholder:text-gray-300 focus:border-[#F5A623] transition-colors"
-                    />
-                    <div className="flex justify-end mt-2">
                       <button
-                        onClick={sendReply}
-                        className="flex items-center gap-1 bg-[#1A1A2E] text-white px-4 py-1.5 rounded-lg text-xs hover:bg-[#2a2a4e] cursor-pointer transition-colors"
+                        onClick={() => deleteNotif(notif.id)}
+                        className="w-7 h-7 flex items-center justify-center rounded bg-red-500 text-white hover:bg-red-600 cursor-pointer transition-colors"
                       >
-                        <Send size={12} /> Send
+                        <Trash2 size={13} />
                       </button>
                     </div>
                   </div>
-                )}
+
+                  <p className={`text-sm mt-1 leading-relaxed ${notif.is_read ? "text-gray-400" : "text-gray-600"}`}>
+                    {notif.body}
+                  </p>
+                  <p className="text-xs text-gray-400 mt-1">{timeAgo(notif.created_at)}</p>
+
+                  {/* Action URL button */}
+                  {notif.action_url && (
+                    <div className="flex gap-2 mt-3">
+                      <button
+                        onClick={() => handleAction(notif.action_url)}
+                        className="px-4 py-1.5 text-xs rounded-lg cursor-pointer bg-[#1A1A2E] text-white hover:bg-[#2a2a4e] transition-colors font-medium"
+                      >
+                        View
+                      </button>
+                    </div>
+                  )}
+                </div>
               </div>
-            </div>
-          ))}
-        </div>
+            ))}
+          </div>
+        )}
 
         {/* Pagination */}
-        <div className="flex items-center justify-center gap-2 mt-8">
-          <button
-            onClick={() => setCurrentPage(p => Math.max(1, p - 1))}
-            className="px-4 py-2 text-sm bg-[#1A1A2E] text-white rounded-lg hover:bg-[#2a2a4e] cursor-pointer transition-colors"
-          >
-            Previous
-          </button>
-          {[1, 2, 3].map(page => (
+        {totalPages > 1 && (
+          <div className="flex items-center justify-center gap-2 mt-8">
             <button
-              key={page}
-              onClick={() => setCurrentPage(page)}
-              className={`w-9 h-9 text-sm rounded-lg cursor-pointer transition-colors font-semibold ${
-                currentPage === page
-                  ? "bg-[#F5A623] text-white"
-                  : "bg-white border border-gray-300 text-gray-600 hover:bg-gray-50"
-              }`}
+              onClick={() => setCurrentPage((p) => Math.max(1, p - 1))}
+              disabled={currentPage === 1}
+              className="flex items-center gap-1 px-4 py-2 text-sm bg-[#1A1A2E] text-white rounded-lg disabled:opacity-40 cursor-pointer"
             >
-              {page}
+              <ChevronLeft size={14} /> Previous
             </button>
-          ))}
-          <button
-            onClick={() => setCurrentPage(p => Math.min(3, p + 1))}
-            className="px-4 py-2 text-sm bg-[#1A1A2E] text-white rounded-lg hover:bg-[#2a2a4e] cursor-pointer transition-colors"
-          >
-            Next
-          </button>
-        </div>
+            {Array.from({ length: totalPages }, (_, i) => i + 1).map((n) => (
+              <button
+                key={n}
+                onClick={() => setCurrentPage(n)}
+                className={`w-9 h-9 text-sm rounded-lg cursor-pointer font-semibold ${
+                  currentPage === n ? "bg-[#F5A623] text-white" : "bg-white border border-gray-300 text-gray-600 hover:bg-gray-50"
+                }`}
+              >
+                {n}
+              </button>
+            ))}
+            <button
+              onClick={() => setCurrentPage((p) => Math.min(totalPages, p + 1))}
+              disabled={currentPage === totalPages}
+              className="flex items-center gap-1 px-4 py-2 text-sm bg-[#1A1A2E] text-white rounded-lg disabled:opacity-40 cursor-pointer"
+            >
+              Next <ChevronRight size={14} />
+            </button>
+          </div>
+        )}
       </div>
     </section>
   );

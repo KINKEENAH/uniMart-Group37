@@ -149,7 +149,7 @@ export default function ContactUs() {
             <div className="bg-white rounded-xl border border-gray-200 p-5">
               <h2 className="font-bold text-sm text-gray-900 mb-3 tracking-wide">QUICK SUPPORT</h2>
               <div className="flex flex-col gap-2">
-                <button className="flex items-center justify-center gap-2 bg-[#1A1A2E] text-white text-sm py-2.5 rounded-lg cursor-pointer hover:bg-[#2a2a4e] transition-colors">
+                <button onClick={() => navigate("/chatseller")} className="flex items-center justify-center gap-2 bg-[#1A1A2E] text-white text-sm py-2.5 rounded-lg cursor-pointer hover:bg-[#2a2a4e] transition-colors">
                   <MessageCircle size={15} /> Live Chat Support
                 </button>
                 <button
