@@ -126,113 +126,118 @@ export default function Notification() {
   };
 
   return (
-    <section className="min-h-screen bg-[#F5F5F5] pt-20 px-4 md:px-8 pb-10">
+    <section className="min-h-screen bg-[#F5F0E8] pt-16 pb-16">
+      <div className="max-w-4xl mx-auto px-6 py-6">
 
-      {/* header */}
-      <div className="flex items-center justify-between mb-4">
-        <div className="flex items-center gap-3">
-          <h1 className="font-bold text-lg tracking-widest text-[#1A1A1A]">NOTIFICATIONS</h1>
-          {unreadCount > 0 && (
-            <span className="border border-gray-300 text-gray-600 text-xs px-2 py-0.5 rounded-full">
-              {unreadCount} new
-            </span>
-          )}
+        {/* Header */}
+        <div className="flex items-center justify-between mb-5">
+          <div className="flex items-center gap-3">
+            <h1 className="font-bold text-xl text-gray-900 tracking-widest">NOTIFICATIONS</h1>
+            {unreadCount > 0 && (
+              <span className="bg-[#F5A623] text-white text-xs font-semibold px-3 py-1 rounded-full">
+                {unreadCount} New
+              </span>
+            )}
+          </div>
+          <div className="flex gap-2">
+            <button className="flex items-center gap-2 border border-gray-300 bg-white px-4 py-2 rounded-lg text-sm text-gray-600 hover:bg-gray-50 cursor-pointer">
+              <Filter size={14} /> Filter
+            </button>
+            <button
+              onClick={markAllRead}
+              className="border border-gray-300 bg-white px-4 py-2 rounded-lg text-sm text-gray-600 hover:bg-gray-50 cursor-pointer"
+            >
+              Mark All Read
+            </button>
+          </div>
         </div>
-        <div className="flex gap-2">
-          <button className="flex items-center gap-1 border border-gray-300 px-3 py-1.5 rounded-md text-xs text-gray-600 hover:bg-gray-50 transition-colors">
-            <Filter size={13} /> Filter
-          </button>
-          <button
-            onClick={markAllRead}
-            className="flex items-center gap-1 border border-gray-300 px-3 py-1.5 rounded-md text-xs text-gray-600 hover:bg-gray-50 transition-colors"
-          >
-            Mark All Read
-          </button>
-        </div>
-      </div>
 
-      {/* tabs */}
-      <div className="flex gap-6 border-b border-gray-200 mb-4">
-        {tabs.map(tab => (
-          <button
-            key={tab}
-            onClick={() => setActiveTab(tab)}
-            className={`pb-2 text-xs tracking-widest font-medium transition-colors duration-200
-              ${activeTab === tab
-                ? "border-b-2 border-[#1A1A1A] text-[#1A1A1A]"
-                : "text-gray-400 hover:text-[#1A1A1A]"
+        {/* Tabs */}
+        <div className="flex gap-8 border-b border-gray-200 mb-5">
+          {tabs.map(tab => (
+            <button
+              key={tab}
+              onClick={() => setActiveTab(tab)}
+              className={`pb-3 text-sm font-semibold cursor-pointer transition-colors ${
+                activeTab === tab
+                  ? "border-b-2 border-gray-900 text-gray-900"
+                  : "text-gray-400 hover:text-gray-600"
               }`}
-          >
-            {tab}
-          </button>
-        ))}
-      </div>
+            >
+              {tab}
+            </button>
+          ))}
+        </div>
 
-      {/* notification list */}
-      <div className="flex flex-col gap-3">
-        {filtered.map(notif => (
-          <div
-            key={notif.id}
-            className={`bg-white rounded-lg p-4 border border-gray-200 transition-all
-              ${notif.read ? "opacity-50" : "opacity-100"}`}
-          >
-            <div className="flex gap-3">
-              {/* icon */}
-              <div className={`w-10 h-10 rounded-full flex items-center justify-center shrink-0
-                ${!notif.read ? "bg-gray-100 text-gray-600" : "bg-gray-100 text-gray-400"}`}>
+        {/* Notification list */}
+        <div className="flex flex-col gap-3">
+          {filtered.map(notif => (
+            <div
+              key={notif.id}
+              className={`rounded-xl border p-4 flex gap-4 transition-all ${
+                notif.read ? "bg-gray-50 border-gray-200 opacity-70" : "bg-white border-gray-200"
+              }`}
+            >
+              {/* Icon */}
+              <div className={`w-10 h-10 rounded-full flex items-center justify-center shrink-0 ${
+                notif.read ? "bg-gray-200 text-gray-400" : "bg-gray-100 text-gray-600"
+              }`}>
                 {iconMap[notif.type]}
               </div>
 
               <div className="flex-1 min-w-0">
                 <div className="flex justify-between items-start gap-2">
                   <div className="flex items-center gap-2 flex-wrap">
-                    <h3 className={`text-sm font-semibold ${!notif.read ? "text-[#1A1A1A]" : "text-gray-400"}`}>
+                    <h3 className={`text-sm font-semibold ${notif.read ? "text-gray-400" : "text-gray-900"}`}>
                       {notif.title}
                     </h3>
                     {notif.isNew && (
-                      <span className="border border-gray-300 text-gray-600 text-xs px-1.5 py-0.5 rounded-sm">
+                      <span className="bg-[#F5A623] text-white text-xs font-semibold px-2 py-0.5 rounded">
                         NEW
                       </span>
                     )}
                   </div>
-                  <div className="flex items-center gap-2 shrink-0">
+                  {/* Mark read / delete */}
+                  <div className="flex items-center gap-1 shrink-0">
                     <button
                       onClick={() => markRead(notif.id)}
-                      className="text-gray-300 hover:text-green-500 transition-colors"
+                      className={`w-7 h-7 flex items-center justify-center rounded cursor-pointer transition-colors ${
+                        notif.read ? "bg-gray-200 text-gray-400" : "bg-green-500 text-white hover:bg-green-600"
+                      }`}
                     >
-                      <Check size={15} />
+                      <Check size={13} />
                     </button>
                     <button
                       onClick={() => deleteNotif(notif.id)}
-                      className="text-gray-300 hover:text-red-500 transition-colors"
+                      className="w-7 h-7 flex items-center justify-center rounded bg-red-500 text-white hover:bg-red-600 cursor-pointer transition-colors"
                     >
-                      <Trash2 size={15} />
+                      <Trash2 size={13} />
                     </button>
                   </div>
                 </div>
 
-                <p className={`text-xs mt-1 ${!notif.read ? "text-gray-600" : "text-gray-400"}`}>
+                <p className={`text-sm mt-1 leading-relaxed ${notif.read ? "text-gray-400" : "text-gray-600"}`}>
                   {notif.message}
                 </p>
 
                 {notif.extra && (
-                  <p className="text-xs font-semibold text-[#1A1A1A] mt-1">{notif.extra}</p>
+                  <p className="text-xs font-semibold text-gray-700 mt-1">{notif.extra}</p>
                 )}
 
                 <p className="text-xs text-gray-400 mt-1">{notif.time}</p>
 
-                {/* action buttons */}
+                {/* Action buttons */}
                 {notif.actions.length > 0 && (
                   <div className="flex gap-2 mt-3 flex-wrap">
                     {notif.actions.map(action => (
                       <button
                         key={action}
                         onClick={() => action === "Reply" ? handleReply(notif.id) : handleAction(action)}
-                        className={`px-3 py-1.5 text-xs rounded-md transition-colors
-                          ${action === "View Order" || action === "Reply"
-                            ? "bg-[#1A1A1A] text-white hover:bg-gray-800"
+                        className={`px-4 py-1.5 text-xs rounded-lg cursor-pointer transition-colors font-medium ${
+                          action === "View Order" || action === "Reply" || action === "Shop Now"
+                            ? "bg-[#1A1A2E] text-white hover:bg-[#2a2a4e]"
                             : "border border-gray-300 text-gray-600 hover:bg-gray-50"
-                          }`}
+                        }`}
                       >
                         {action}
                       </button>
@@ -240,12 +245,12 @@ export default function Notification() {
                   </div>
                 )}
 
-                {/* reply box */}
+                {/* Reply box */}
                 {replyingTo === notif.id && (
-                  <div className="mt-3 border border-gray-200 rounded-md p-3 bg-gray-50">
+                  <div className="mt-3 border border-gray-200 rounded-lg p-3 bg-gray-50">
                     <div className="flex justify-between items-center mb-2">
                       <p className="text-xs text-gray-500 font-medium">Reply to message</p>
-                      <button onClick={() => setReplyingTo(null)}>
+                      <button onClick={() => setReplyingTo(null)} className="cursor-pointer">
                         <X size={14} className="text-gray-400 hover:text-gray-600" />
                       </button>
                     </div>
@@ -254,12 +259,12 @@ export default function Notification() {
                       onChange={(e) => setReplyText(e.target.value)}
                       placeholder="Type your reply..."
                       rows={3}
-                      className="w-full border border-gray-200 rounded-md p-2 text-xs outline-none resize-none placeholder:text-gray-300 focus:border-[#1A1A1A] transition-colors"
+                      className="w-full border border-gray-200 rounded-lg p-2 text-xs outline-none resize-none placeholder:text-gray-300 focus:border-[#F5A623] transition-colors"
                     />
                     <div className="flex justify-end mt-2">
                       <button
                         onClick={sendReply}
-                        className="flex items-center gap-1 bg-[#1A1A1A] text-white px-4 py-1.5 rounded-md text-xs hover:bg-gray-800 transition-colors"
+                        className="flex items-center gap-1 bg-[#1A1A2E] text-white px-4 py-1.5 rounded-lg text-xs hover:bg-[#2a2a4e] cursor-pointer transition-colors"
                       >
                         <Send size={12} /> Send
                       </button>
@@ -268,37 +273,37 @@ export default function Notification() {
                 )}
               </div>
             </div>
-          </div>
-        ))}
-      </div>
+          ))}
+        </div>
 
-      {/* pagination */}
-      <div className="flex items-center justify-center gap-2 mt-8">
-        <button
-          onClick={() => setCurrentPage(p => Math.max(1, p - 1))}
-          className="px-3 py-1.5 text-xs border border-gray-300 rounded-md hover:bg-gray-50 transition-colors"
-        >
-          Previous
-        </button>
-        {[1, 2, 3].map(page => (
+        {/* Pagination */}
+        <div className="flex items-center justify-center gap-2 mt-8">
           <button
-            key={page}
-            onClick={() => setCurrentPage(page)}
-            className={`w-8 h-8 text-xs rounded-md transition-colors
-              ${currentPage === page
-                ? "bg-[#1A1A1A] text-white"
-                : "border border-gray-300 hover:bg-gray-50"
-              }`}
+            onClick={() => setCurrentPage(p => Math.max(1, p - 1))}
+            className="px-4 py-2 text-sm bg-[#1A1A2E] text-white rounded-lg hover:bg-[#2a2a4e] cursor-pointer transition-colors"
           >
-            {page}
+            Previous
           </button>
-        ))}
-        <button
-          onClick={() => setCurrentPage(p => Math.min(3, p + 1))}
-          className="px-3 py-1.5 text-xs border border-gray-300 rounded-md hover:bg-gray-50 transition-colors"
-        >
-          Next
-        </button>
+          {[1, 2, 3].map(page => (
+            <button
+              key={page}
+              onClick={() => setCurrentPage(page)}
+              className={`w-9 h-9 text-sm rounded-lg cursor-pointer transition-colors font-semibold ${
+                currentPage === page
+                  ? "bg-[#F5A623] text-white"
+                  : "bg-white border border-gray-300 text-gray-600 hover:bg-gray-50"
+              }`}
+            >
+              {page}
+            </button>
+          ))}
+          <button
+            onClick={() => setCurrentPage(p => Math.min(3, p + 1))}
+            className="px-4 py-2 text-sm bg-[#1A1A2E] text-white rounded-lg hover:bg-[#2a2a4e] cursor-pointer transition-colors"
+          >
+            Next
+          </button>
+        </div>
       </div>
     </section>
   );

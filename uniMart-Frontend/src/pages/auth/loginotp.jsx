@@ -2,6 +2,8 @@ import { useState, useRef } from "react";
 import { useNavigate, useLocation } from "react-router-dom";
 import { motion } from "framer-motion";
 import { useAuth } from "../../context/authContext";
+import loginImage from "../../assets/login.png";
+import logo from "../../assets/UniMart.png";
 
 export default function LoginOtp() {
   const [otp, setOtp] = useState(["", "", "", "", "", ""]);
@@ -12,33 +14,25 @@ export default function LoginOtp() {
   const navigate = useNavigate();
   const location = useLocation();
   const { login } = useAuth();
-
-  const { user_id, email } = location.state || {};
+  const { user_id, email, from } = location.state || {};
 
   const handleChange = (value, index) => {
     if (isNaN(value)) return;
     const newOtp = [...otp];
     newOtp[index] = value;
     setOtp(newOtp);
-    if (value && index < 5) {
-      inputs.current[index + 1].focus();
-    }
+    if (value && index < 5) inputs.current[index + 1].focus();
   };
 
   const handleBackspace = (e, index) => {
-    if (e.key === "Backspace" && !otp[index] && index > 0) {
+    if (e.key === "Backspace" && !otp[index] && index > 0)
       inputs.current[index - 1].focus();
-    }
   };
 
   const handleVerify = async () => {
     setError("");
     const code = otp.join("");
-
-    if (code.length < 6) {
-      return setError("Please enter the full 6-digit code");
-    }
-
+    if (code.length < 6) return setError("Please enter the full 6-digit code");
     setLoading(true);
     try {
       const res = await fetch("/api/auth/verify-login", {
@@ -46,16 +40,11 @@ export default function LoginOtp() {
         headers: { "Content-Type": "application/json" },
         body: JSON.stringify({ user_id, code }),
       });
-
       const data = await res.json();
-
-      if (!res.ok) {
-        return setError(data.message || "Verification failed");
-      }
-
+      if (!res.ok) return setError(data.message || "Verification failed");
       login(data.user, data.token);
-      navigate("/shop");
-    } catch (err) {
+      navigate(location.state?.from || "/shop");
+    } catch {
       setError("Network error. Is the server running?");
     } finally {
       setLoading(false);
@@ -80,27 +69,36 @@ export default function LoginOtp() {
   };
 
   return (
-    <section className="min-h-screen bg-white">
-      <div className="flex flex-row min-h-screen">
-        <div className="hidden md:flex bg-[#D9D9D9] w-1/2 items-center justify-center">
-          <img src="" alt="" className="h-full w-full object-cover" />
+    <div className="flex min-h-screen">
+      {/* Left — image panel */}
+      <div className="hidden md:block w-1/2 bg-[#0D1B2A] relative overflow-hidden">
+        <img
+          src={loginImage}
+          alt="UniMart app"
+          className="absolute bottom-0 left-0 w-full h-full object-cover object-center"
+        />
+      </div>
+
+      {/* Right — form panel */}
+      <div className="w-full md:w-1/2 bg-white flex flex-col px-12 py-12">
+        {/* Logo — top right */}
+        <div className="flex justify-end">
+          <img src={logo} alt="UniMart" className="h-7 object-contain" />
         </div>
 
-        <div className="w-full md:w-1/2 bg-white flex flex-col justify-center px-10 py-12">
-          <div className="flex justify-end mb-10">
-            <span className="font-nico text-xl text-[#1A1A1A]">UniMart</span>
-          </div>
-
+        {/* Content — vertically centered */}
+        <div className="flex flex-col justify-center flex-1">
           <div className="text-center mb-8">
-            <h1 className="font-semibold text-2xl text-[#1A1A1A] mb-3">Enter your login code</h1>
-            <p className="text-sm text-[#736E6E]">
+            <h1 className="font-semibold text-2xl text-gray-900 mb-3">Enter your login code</h1>
+            <p className="text-sm text-gray-500">
               Check your email for a 6-digit code and enter it
-              <br /> below to access your account.
+              <br />below to access your account.
             </p>
-            {email && <p className="text-sm text-[#1A1A1A] font-medium mt-1">{email}</p>}
+            {email && <p className="text-sm text-gray-700 font-medium mt-1">{email}</p>}
           </div>
 
-          <div className="flex gap-3 justify-center mb-4">
+          {/* OTP inputs */}
+          <div className="flex gap-3 justify-center mb-6">
             {otp.map((digit, index) => (
               <input
                 key={index}
@@ -110,7 +108,7 @@ export default function LoginOtp() {
                 value={digit}
                 onChange={(e) => handleChange(e.target.value, index)}
                 onKeyDown={(e) => handleBackspace(e, index)}
-                className="w-12 h-12 border border-[#D9D9D9] rounded-sm text-center text-xl outline-none focus:border-[#1A1A1A] transition-colors duration-200"
+                className="w-12 h-14 border border-[#F5A623] rounded-lg text-center text-xl outline-none focus:ring-2 focus:ring-[#F5A623]/40 transition-colors duration-200"
               />
             ))}
           </div>
@@ -121,25 +119,22 @@ export default function LoginOtp() {
           <motion.button
             whileHover={{ scale: 1.02 }}
             whileTap={{ scale: 0.98 }}
-            transition={{ duration: 0.3, ease: "easeOut" }}
+            transition={{ duration: 0.2 }}
             onClick={handleVerify}
             disabled={loading}
-            className="w-full bg-[#1A1A1A] text-white p-3 rounded-md tracking-widest text-sm uppercase hover:bg-[#333333] transition-colors duration-200 disabled:opacity-60"
+            className="w-full bg-[#F5A623] text-white font-semibold py-3 rounded-lg text-sm tracking-widest uppercase disabled:opacity-60"
           >
             {loading ? "Verifying..." : "Login"}
           </motion.button>
 
-          <p className="text-center text-xs text-[#736E6E] mt-4">
+          <p className="text-center text-sm text-gray-500 mt-4">
             Didn't get the code?{" "}
-            <span
-              onClick={handleResend}
-              className="text-[#1A1A1A] font-semibold cursor-pointer hover:underline"
-            >
+            <span onClick={handleResend} className="text-[#F5A623] cursor-pointer hover:underline">
               Resend code
             </span>
           </p>
         </div>
       </div>
-    </section>
+    </div>
   );
 }
