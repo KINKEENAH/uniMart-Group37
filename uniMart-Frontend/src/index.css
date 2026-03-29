@@ -9,6 +9,7 @@
 }
 html {
   scroll-behavior: smooth;
+  background-color: #0D1B2A;
 }
 input::-ms-reveal,
 input::-ms-clear {

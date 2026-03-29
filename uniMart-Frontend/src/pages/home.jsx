@@ -10,7 +10,7 @@ export default function Home() {
     <section className="bg-[#0D1B2A] w-full min-h-screen flex items-center overflow-hidden">
       <div className="w-full flex flex-col md:flex-row items-stretch min-h-screen">
         {/* Hero image — flush left, flush bottom */}
-        <div className="shrink-0 flex items-end w-full md:w-[45%] relative">
+        <div className="shrink-0 flex items-end w-full md:w-[45%] relative pt-16 md:pt-0">
           {/* Yellow circle behind image */}
           <div className="absolute bottom-0 left-0 w-95 h-95 md:w-120 md:h-120 rounded-full " />
           <img

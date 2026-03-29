@@ -76,7 +76,7 @@ export default function ProductDetails() {
   const title = display?.title || display?.name || "—";
 
   return (
-    <div className="min-h-screen bg-[#F5F0E8] pt-16 pb-16">
+    <div className="min-h-screen bg-[#F5F0E8] pt-16 pb-6">
       {/* Breadcrumb + View Cart */}
       <div className="px-10 py-4 flex items-center justify-between">
         <div className="flex items-center gap-1 text-sm text-gray-500">
@@ -93,7 +93,7 @@ export default function ProductDetails() {
 
       <div className="px-10 pb-16 flex flex-col md:flex-row gap-10">
         {/* Product image — shows immediately from preview */}
-        <div className="w-full md:w-1/2 bg-white rounded-xl overflow-hidden flex items-center justify-center min-h-[420px]">
+        <div className="w-full md:w-[42%] bg-white rounded-xl overflow-hidden flex items-center justify-center h-72 md:h-120 shrink-0">
           {coverImage ? (
             <img src={coverImage} alt={title} className="w-full h-full object-cover" />
           ) : (

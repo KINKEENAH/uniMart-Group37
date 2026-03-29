@@ -18,7 +18,7 @@ router.get("/", async (req, res) => {
     } catch {}
   }
 
-  const { category } = req.query;
+  const { category, search } = req.query;
 
   try {
     const where = {
@@ -26,6 +26,9 @@ router.get("/", async (req, res) => {
       ...(excludeUserId && { seller_id: { not: excludeUserId } }),
       ...(category && {
         category: { name: { equals: category, mode: "insensitive" } },
+      }),
+      ...(search && {
+        title: { contains: search, mode: "insensitive" },
       }),
     };
 

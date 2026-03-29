@@ -103,11 +103,12 @@ export default function Notification() {
             )}
           </div>
           <div className="flex gap-2">
-            <button className="flex items-center gap-2 border border-gray-300 bg-white px-4 py-2 rounded-lg text-sm text-gray-600 hover:bg-gray-50 cursor-pointer" onClick={() => setActiveTab("ALL")}>
-              <Filter size={14} /> Filter
+            <button className="flex items-center gap-1 border border-gray-300 bg-white px-2 py-1.5 md:px-4 md:py-2 rounded-lg text-xs md:text-sm text-gray-600 hover:bg-gray-50 cursor-pointer" onClick={() => setActiveTab("ALL")}>
+              <Filter size={13} /> <span className="hidden sm:inline">Filter</span>
             </button>
-            <button onClick={markAllRead} className="border border-gray-300 bg-white px-4 py-2 rounded-lg text-sm text-gray-600 hover:bg-gray-50 cursor-pointer">
-              Mark All Read
+            <button onClick={markAllRead} className="border border-gray-300 bg-white px-2 py-1.5 md:px-4 md:py-2 rounded-lg text-xs md:text-sm text-gray-600 hover:bg-gray-50 cursor-pointer whitespace-nowrap">
+              <span className="hidden sm:inline">Mark All Read</span>
+              <span className="sm:hidden">Read All</span>
             </button>
           </div>
         </div>
