@@ -140,10 +140,19 @@ export default function ChatSeller() {
 
   const grouped = groupByDate(messages);
 
+  const [mobileView, setMobileView] = useState(activeConvId ? "chat" : "list");
+
+  // When a conversation is selected on mobile, switch to chat view
+  const handleSelectConv = (id) => {
+    setActiveConvId(id);
+    setMobileView("chat");
+  };
+
   return (
     <div className="flex h-screen bg-[#F5F0E8] pt-16">
-      {/* Sidebar */}
-      <div className="w-80 shrink-0 bg-white border-r border-gray-200 flex flex-col">
+      {/* Sidebar — full screen on mobile when showing list */}
+      <div className={`bg-white border-r border-gray-200 flex flex-col
+        ${mobileView === "list" ? "flex w-full md:w-80 md:shrink-0" : "hidden md:flex md:w-80 md:shrink-0"}`}>
         <div className="p-4 border-b border-gray-100">
           <div className="flex items-center gap-2 bg-gray-50 border border-gray-200 rounded-xl px-3 py-2">
             <Search size={15} className="text-gray-400 shrink-0" />
@@ -185,7 +194,7 @@ export default function ChatSeller() {
             return (
               <div
                 key={conv.id}
-                onClick={() => setActiveConvId(conv.id)}
+                onClick={() => handleSelectConv(conv.id)}
                 className={`flex items-start gap-3 px-4 py-3 cursor-pointer border-b border-gray-50 transition-colors ${
                   activeConvId === conv.id ? "bg-[#F5F0E8]" : "hover:bg-gray-50"
                 }`}
@@ -214,13 +223,21 @@ export default function ChatSeller() {
         </div>
       </div>
 
-      {/* Chat area */}
-      <div className="flex-1 flex flex-col min-w-0">
+      {/* Chat area — full screen on mobile when showing chat */}
+      <div className={`flex-1 flex-col min-w-0
+        ${mobileView === "chat" ? "flex w-full" : "hidden md:flex"}`}>
         {activeConvId || otherPerson ? (
           <>
             {/* Header */}
-            <div className="bg-white border-b border-gray-200 px-6 py-3 flex items-center justify-between">
+            <div className="bg-white border-b border-gray-200 px-4 py-3 flex items-center justify-between">
               <div className="flex items-center gap-3">
+                {/* Back button — mobile only */}
+                <button
+                  onClick={() => setMobileView("list")}
+                  className="md:hidden text-gray-500 hover:text-gray-800 cursor-pointer bg-transparent border-none text-lg leading-none"
+                >
+                  ←
+                </button>
                 <div className="w-10 h-10 rounded-full bg-gray-200 flex items-center justify-center text-gray-500 font-semibold text-sm">
                   {otherPerson?.full_name?.[0] || "?"}
                 </div>
@@ -284,7 +301,7 @@ export default function ChatSeller() {
             </div>
 
             {/* Input */}
-            <div className="bg-white border-t border-gray-200 px-6 py-3">
+            <div className="bg-white border-t border-gray-200 px-3 md:px-6 py-3">
               <div className="flex items-center gap-3 bg-gray-50 border border-gray-200 rounded-2xl px-4 py-2.5">
                 <button className="text-gray-400 hover:text-gray-600 cursor-pointer shrink-0"><Paperclip size={18} /></button>
                 <input

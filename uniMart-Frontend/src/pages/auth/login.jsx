@@ -3,7 +3,7 @@ import { Eye, EyeOff } from "lucide-react";
 import { useState } from "react";
 import { motion } from "framer-motion";
 import loginImage from "../../assets/login.png";
-import logo from "../../assets/UniMart.png";
+import logo from "../../assets/unimart_bnw.png";
 import { useAuth } from "../../context/authContext";
 
 export default function Login() {

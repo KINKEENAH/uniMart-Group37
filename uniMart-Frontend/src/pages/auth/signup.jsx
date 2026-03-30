@@ -3,7 +3,7 @@ import { useState } from "react";
 import { Eye, EyeOff } from "lucide-react";
 import { motion } from "framer-motion";
 import heroImage from "../../assets/Frame 8.png";
-import logo from "../../assets/UniMart.png";
+import logo from "../../assets/unimart_bnw.png";
 import { useAuth } from "../../context/authContext";
 
 export default function SignUp() {
