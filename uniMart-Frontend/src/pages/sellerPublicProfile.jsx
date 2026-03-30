@@ -19,7 +19,7 @@ export default function SellerPublicProfile() {
         if (data.seller) setSeller(data.seller);
         else setError(data.message || "Seller not found");
       })
-      .catch(() => setError("Network error."))
+      .catch(() =>  setError("Network error."))
       .finally(() => setLoading(false));
   }, [sellerId]);
 
