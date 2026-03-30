@@ -54,7 +54,7 @@ export default function Shop() {
       price: parseFloat(product.price),
       image: product.images?.[0]?.image_url || null,
       category: product.category?.name || "",
-      seller: { name: product.seller?.full_name || "—" },
+      seller: { id: product.seller?.id || null, name: product.seller?.full_name || "—" },
     });
     setToast(product.title);
     setTimeout(() => setToast(null), 2500);

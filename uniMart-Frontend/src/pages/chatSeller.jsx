@@ -82,13 +82,14 @@ export default function ChatSeller() {
           const data = await res.json();
           if (res.ok) {
             setActiveConvId(data.conversation.id);
-            await fetchConversations();
+            // Refresh conversation list so the new one appears in sidebar
+            fetchConversations();
           }
         } catch {}
       }
     };
     init();
-  }, [token, sellerId, productId]);
+  }, [token, sellerId, productId, fetchConversations]);
 
   // Load messages when active conversation changes
   useEffect(() => {

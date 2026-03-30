@@ -40,7 +40,7 @@ export default function ProductDetails() {
       price: parseFloat(product.price),
       image: product.images?.[0]?.image_url || null,
       category: product.category?.name || "",
-      seller: { name: product.seller?.full_name || "—" },
+      seller: { id: product.seller?.id || null, name: product.seller?.full_name || "—" },
     });
     navigate("/viewcart");
   };

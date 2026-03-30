@@ -44,7 +44,7 @@ export default function Checkout() {
         method: "POST",
         headers: { "Content-Type": "application/json", Authorization: `Bearer ${token}` },
         body: JSON.stringify({
-          items: cartItems.map((i) => ({ product_id: i.id, quantity: i.quantity, unit_price: i.price })),
+          items: cartItems.map((i) => ({ product_id: i.id, seller_id: i.seller?.id || null, quantity: i.quantity, unit_price: i.price })),
           subtotal,
           tax_amount: tax,
           total_amount: total,

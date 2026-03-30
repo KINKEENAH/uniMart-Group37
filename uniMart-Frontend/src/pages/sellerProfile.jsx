@@ -17,6 +17,8 @@ export default function SellerProfile() {
   const [myProducts, setMyProducts] = useState([]);
   const [loadingProducts, setLoadingProducts] = useState(true);
   const [editingProduct, setEditingProduct] = useState(null);
+  const [sellerOrders, setSellerOrders] = useState([]);
+  const [loadingOrders, setLoadingOrders] = useState(false);
 
   const fetchProducts = useCallback(async () => {
     if (!token) return;
@@ -32,6 +34,17 @@ export default function SellerProfile() {
   }, [token]);
 
   useEffect(() => { fetchProducts(); }, [fetchProducts]);
+
+  // Fetch seller orders when tab opens
+  useEffect(() => {
+    if (activeTab !== "orders" || !token) return;
+    setLoadingOrders(true);
+    fetch("/api/orders/seller", { headers: { Authorization: `Bearer ${token}` } })
+      .then((r) => r.json())
+      .then((data) => { if (data.orderItems) setSellerOrders(data.orderItems); })
+      .catch(() => {})
+      .finally(() => setLoadingOrders(false));
+  }, [activeTab, token]);
 
   const handleDelete = async (id) => {
     if (!confirm("Delete this product?")) return;
@@ -222,8 +235,48 @@ export default function SellerProfile() {
         )}
 
         {activeTab === "orders" && (
-          <div className="bg-white rounded-xl border border-gray-200 p-10 text-center text-gray-400 text-sm">
-            No order history yet.
+          <div>
+            <h2 className="font-bold text-lg text-gray-900 mb-4">Order History</h2>
+            {loadingOrders ? (
+              <p className="text-center text-sm text-gray-400 py-10">Loading orders...</p>
+            ) : sellerOrders.length === 0 ? (
+              <div className="bg-white rounded-xl border border-gray-200 p-10 text-center text-gray-400 text-sm">
+                No orders yet. Orders from buyers will appear here.
+              </div>
+            ) : (
+              <div className="space-y-3">
+                {sellerOrders.map((item) => (
+                  <div key={item.id} className="bg-white rounded-xl border border-gray-200 p-4 flex gap-4">
+                    {item.product?.images?.[0]?.image_url ? (
+                      <img src={item.product.images[0].image_url} alt={item.product.title} className="w-16 h-16 object-cover rounded-lg shrink-0" />
+                    ) : (
+                      <div className="w-16 h-16 bg-gray-100 rounded-lg shrink-0 flex items-center justify-center">
+                        <Package size={20} className="text-gray-300" />
+                      </div>
+                    )}
+                    <div className="flex-1 min-w-0">
+                      <div className="flex justify-between items-start">
+                        <div>
+                          <p className="text-sm font-semibold text-gray-900 truncate">{item.product?.title || "—"}</p>
+                          <p className="text-xs text-gray-400">Buyer: {item.order?.buyer?.full_name || "—"}</p>
+                          <p className="text-xs text-gray-400">Qty: {item.quantity} · ₵{parseFloat(item.unit_price).toFixed(2)} each</p>
+                        </div>
+                        <span className={`text-xs font-semibold px-2 py-1 rounded border shrink-0 ${
+                          item.order?.status === "delivered" ? "text-green-600 border-green-300 bg-green-50" : "text-orange-500 border-orange-300 bg-orange-50"
+                        }`}>
+                          {item.order?.status?.toUpperCase() || "PENDING"}
+                        </span>
+                      </div>
+                      <div className="flex flex-wrap gap-3 mt-1 text-xs text-gray-400">
+                        <span>📍 {item.order?.meetup_location?.name || "—"}</span>
+                        <span>💳 {item.order?.payment_method || "—"}</span>
+                        <span>{new Date(item.order?.created_at).toLocaleDateString()}</span>
+                      </div>
+                    </div>
+                  </div>
+                ))}
+              </div>
+            )}
           </div>
         )}
 

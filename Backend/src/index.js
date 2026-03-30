@@ -3,6 +3,8 @@ import express from "express";
 import cors from "cors";
 import helmet from "helmet";
 import morgan from "morgan";
+import { fileURLToPath } from "url";
+import path from "path";
 
 import authRoutes from "./routes/auth.js";
 import userRoutes from "./routes/users.js";
@@ -12,14 +14,17 @@ import conversationRoutes from "./routes/conversations.js";
 import wishlistRoutes from "./routes/wishlists.js";
 import notificationRoutes from "./routes/notifications.js";
 
+const __filename = fileURLToPath(import.meta.url);
+const __dirname = path.dirname(__filename);
+
 const app = express();
 
-app.use(helmet());
+app.use(helmet({ contentSecurityPolicy: false }));
 app.use(cors({ origin: process.env.CLIENT_URL || "http://localhost:5173" }));
-app.use(express.json());
+app.use(express.json({ limit: "10mb" }));
 app.use(morgan("dev"));
 
-// Routes
+// ─── API Routes ───────────────────────────────────────────────────────────────
 app.use("/api/auth", authRoutes);
 app.use("/api/users", userRoutes);
 app.use("/api/products", productRoutes);
@@ -28,17 +33,21 @@ app.use("/api/conversations", conversationRoutes);
 app.use("/api/wishlists", wishlistRoutes);
 app.use("/api/notifications", notificationRoutes);
 
-// Health check
-app.get("/", (req, res) => {
-  res.json({ message: "uniMart API is running" });
+// ─── API 404 (only for /api routes) ──────────────────────────────────────────
+app.use("/api", (req, res) => {
+  res.status(404).json({ message: "API route not found" });
 });
 
-// 404
-app.use((req, res) => {
-  res.status(404).json({ message: "Route not found" });
+// ─── Serve React frontend ─────────────────────────────────────────────────────
+const distPath = path.join(__dirname, "../../uniMart-Frontend/dist");
+app.use(express.static(distPath));
+
+// Catch-all: serve index.html for React Router routes
+app.get("*", (req, res) => {
+  res.sendFile(path.join(distPath, "index.html"));
 });
 
-// Global error handler
+// ─── Global error handler ─────────────────────────────────────────────────────
 app.use((err, req, res, next) => {
   console.error(err.stack);
   res.status(500).json({ message: "Something went wrong" });
