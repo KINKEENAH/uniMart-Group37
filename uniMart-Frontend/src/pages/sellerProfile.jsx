@@ -1,9 +1,9 @@
 import { useState, useEffect, useCallback } from "react";
-import { useNavigate } from "react-router-dom";
+import { useNavigate, useLocation } from "react-router-dom";
 import {
   Mail, Phone, Calendar, GraduationCap, User, MapPin,
   ShoppingBag, Package, TrendingUp, LayoutGrid, History,
-  Pencil, ShieldCheck, Star, Eye, Trash2, Plus, LogOut
+  Pencil, ShieldCheck, Star, Eye, Trash2, Plus, LogOut, MessageCircle
 } from "lucide-react";
 import { useAuth } from "../context/authContext";
 import EditProfileModal from "../components/EditProfileModal";
@@ -11,8 +11,11 @@ import EditProductModal from "../components/EditProductModal";
 
 export default function SellerProfile() {
   const navigate = useNavigate();
+  const location = useLocation();
   const { user, token, logout } = useAuth();
-  const [activeTab, setActiveTab] = useState("products");
+  const [activeTab, setActiveTab] = useState(
+    new URLSearchParams(location.search).get("tab") === "orders" ? "orders" : "products"
+  );
   const [showEdit, setShowEdit] = useState(false);
   const [myProducts, setMyProducts] = useState([]);
   const [loadingProducts, setLoadingProducts] = useState(true);
@@ -45,6 +48,26 @@ export default function SellerProfile() {
       .catch(() => {})
       .finally(() => setLoadingOrders(false));
   }, [activeTab, token]);
+
+  const handleToggleStatus = async (orderId, currentStatus) => {
+    const newStatus = currentStatus === "delivered" ? "pending" : "delivered";
+    try {
+      const res = await fetch(`/api/orders/${orderId}/status`, {
+        method: "PATCH",
+        headers: { "Content-Type": "application/json", Authorization: `Bearer ${token}` },
+        body: JSON.stringify({ status: newStatus }),
+      });
+      if (res.ok) {
+        setSellerOrders((prev) =>
+          prev.map((item) =>
+            item.order?.id === orderId
+              ? { ...item, order: { ...item.order, status: newStatus } }
+              : item
+          )
+        );
+      }
+    } catch {}
+  };
 
   const handleDelete = async (id) => {
     if (!confirm("Delete this product?")) return;
@@ -271,6 +294,24 @@ export default function SellerProfile() {
                         <span>📍 {item.order?.meetup_location?.name || "—"}</span>
                         <span>💳 {item.order?.payment_method || "—"}</span>
                         <span>{new Date(item.order?.created_at).toLocaleDateString()}</span>
+                      </div>
+                      <div className="flex flex-wrap gap-2 mt-3">
+                        <button
+                          onClick={() => navigate("/chatseller", { state: { sellerId: item.order?.buyer?.id, sellerName: item.order?.buyer?.full_name } })}
+                          className="flex items-center gap-1 text-xs border border-gray-300 px-3 py-1.5 rounded-lg cursor-pointer hover:bg-gray-50"
+                        >
+                          <MessageCircle size={12} /> Contact Buyer
+                        </button>
+                        <button
+                          onClick={() => handleToggleStatus(item.order?.id, item.order?.status)}
+                          className={`flex items-center gap-1 text-xs px-3 py-1.5 rounded-lg cursor-pointer transition-colors ${
+                            item.order?.status === "delivered"
+                              ? "bg-orange-50 text-orange-500 border border-orange-300 hover:bg-orange-100"
+                              : "bg-green-50 text-green-600 border border-green-300 hover:bg-green-100"
+                          }`}
+                        >
+                          Mark as {item.order?.status === "delivered" ? "Pending" : "Delivered"}
+                        </button>
                       </div>
                     </div>
                   </div>

@@ -93,4 +93,31 @@ router.patch(
   }
 );
 
+// ─── GET /api/users/:id/public ───────────────────────────────────────────────
+router.get("/:id/public", async (req, res) => {
+  try {
+    const user = await prisma.user.findUnique({
+      where: { id: req.params.id },
+      select: {
+        id: true, full_name: true, department: true, level: true,
+        campus_location: true, rating: true, total_sales: true,
+        student_since: true, created_at: true, is_verified: true,
+        products: {
+          where: { status: "active" },
+          orderBy: { created_at: "desc" },
+          include: {
+            images: { orderBy: { display_order: "asc" }, take: 1 },
+            category: true,
+          },
+        },
+      },
+    });
+    if (!user) return res.status(404).json({ message: "Seller not found" });
+    return res.json({ seller: user });
+  } catch (err) {
+    console.error(err);
+    return res.status(500).json({ message: "Internal server error" });
+  }
+});
+
 export default router;

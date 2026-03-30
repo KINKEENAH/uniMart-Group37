@@ -163,7 +163,10 @@ export default function ProductDetails() {
               {/* Seller card */}
               <div className="border border-gray-200 rounded-xl p-4 flex items-start justify-between bg-white">
                 <div className="flex flex-col gap-1">
-                  <p className="text-sm font-semibold text-gray-800">{product.seller?.full_name || "—"}</p>
+                  <p
+                    className="text-sm font-semibold text-gray-800 cursor-pointer hover:text-[#F5A623] transition-colors"
+                    onClick={() => navigate("/seller/" + product.seller?.id, { state: { sellerId: product.seller?.id } })}
+                  >{product.seller?.full_name || "—"}</p>
                   <div className="flex items-center gap-1 text-xs text-gray-500">
                     <Star size={12} className="fill-[#F5A623] text-[#F5A623]" />
                     {product.seller?.rating?.toFixed(1) || "0.0"} rating • {product.seller?.total_sales || 0} sales

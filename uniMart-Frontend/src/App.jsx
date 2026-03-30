@@ -20,6 +20,7 @@ import LoginOtp from "./pages/auth/loginotp";
 import SellerDash from "./pages/sellerDashboard";
 import SellerProfile from "./pages/sellerProfile";
 import AddProduct from "./pages/addProduct";
+import SellerPublicProfile from "./pages/sellerPublicProfile";
 
 function App() {
   const location = useLocation();
@@ -49,6 +50,7 @@ function App() {
           <Route path="/notification" element={<RequireAuth><Notification /></RequireAuth>} />
           <Route path="/chatseller" element={<RequireAuth><ChatSeller /></RequireAuth>} />
           <Route path="/sellerdashboard" element={<RequireAuth><SellerDash /></RequireAuth>} />
+          <Route path="/seller/:id" element={<SellerPublicProfile />} />
         </Routes>
       </AnimatePresence>
     </>

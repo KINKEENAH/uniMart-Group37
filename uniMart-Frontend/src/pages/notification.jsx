@@ -71,10 +71,12 @@ export default function Notification() {
     }).catch(() => {});
   };
 
-  const handleAction = (action) => {
-    if (action === "View Order") navigate("/buyerprofile");
-    if (action === "Contact Seller" || action === "View Chat" || action === "Reply") navigate("/chatseller");
-    if (action === "Shop Now") navigate("/shop");
+  const handleAction = (actionUrl) => {
+    if (!actionUrl) return;
+    if (actionUrl.startsWith("/")) { navigate(actionUrl); return; }
+    if (actionUrl === "View Order") navigate("/sellerprofile?tab=orders");
+    if (actionUrl === "Contact Seller" || actionUrl === "View Chat" || actionUrl === "Reply") navigate("/chatseller");
+    if (actionUrl === "Shop Now") navigate("/shop");
   };
 
   const filtered = notifs.filter((n) => {
@@ -184,7 +186,6 @@ export default function Notification() {
                   </p>
                   <p className="text-xs text-gray-400 mt-1">{timeAgo(notif.created_at)}</p>
 
-                  {/* Action URL button */}
                   {notif.action_url && (
                     <div className="flex gap-2 mt-3">
                       <button

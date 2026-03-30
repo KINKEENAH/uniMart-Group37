@@ -61,7 +61,7 @@ router.post("/", requireAuth, async (req, res) => {
             type: "order",
             title: "New Order Received",
             body: `${buyer?.full_name || "A buyer"} placed an order. Meet-up: ${meetup_location_name || "TBD"}. Payment: ${payment_method || "TBD"}.`,
-            action_url: "View Order",
+            action_url: "/sellerprofile?tab=orders",
           },
         })
       ),
@@ -131,6 +131,44 @@ router.get("/seller", requireAuth, async (req, res) => {
       orderBy: { order: { created_at: "desc" } },
     });
     return res.json({ orderItems });
+  } catch (err) {
+    console.error(err);
+    return res.status(500).json({ message: "Internal server error" });
+  }
+});
+
+// ─── PATCH /api/orders/:id/status ────────────────────────────────────────────
+router.patch("/:id/status", requireAuth, async (req, res) => {
+  const { status } = req.body;
+  if (!["pending", "delivered"].includes(status))
+    return res.status(400).json({ message: "Status must be pending or delivered" });
+  try {
+    // Verify the requester is a seller on this order
+    const orderItem = await prisma.orderItem.findFirst({
+      where: { order_id: req.params.id, seller_id: req.userId },
+    });
+    if (!orderItem) return res.status(403).json({ message: "Forbidden" });
+
+    const order = await prisma.order.update({
+      where: { id: req.params.id },
+      data: { status, ...(status === "delivered" ? { confirmed_at: new Date() } : {}) },
+    });
+
+    // Notify buyer
+    const buyerNotifBody = status === "delivered"
+      ? "Your order has been marked as delivered. Thank you for shopping on UniMart!"
+      : "Your order status has been updated to pending.";
+    await prisma.notification.create({
+      data: {
+        user_id: order.buyer_id,
+        type: "order",
+        title: status === "delivered" ? "Order Delivered" : "Order Updated",
+        body: buyerNotifBody,
+        action_url: "View Order",
+      },
+    });
+
+    return res.json({ message: "Status updated", order });
   } catch (err) {
     console.error(err);
     return res.status(500).json({ message: "Internal server error" });
