@@ -44,7 +44,9 @@ export default function Navbar() {
 
         {/* Right icons + auth */}
         <div className="hidden md:flex items-center gap-5">
-          <button className="cursor-pointer text-gray-300 hover:text-[#F5A623] transition-colors duration-200">
+          <button
+            onClick={() => navigate("/shop")}
+            className="cursor-pointer text-gray-300 hover:text-[#F5A623] transition-colors duration-200">
             <Search size={17} />
           </button>
           <button

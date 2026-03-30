@@ -2,6 +2,7 @@ import { useState } from "react";
 import { useNavigate } from "react-router-dom";
 import { MapPin, CreditCard, Check, Banknote, Smartphone } from "lucide-react";
 import { useCart } from "../context/cartContext";
+import { useAuth } from "../context/authContext";
 
 const locations = [
   { id: 1, name: "Main Library Entrance", hours: "Available: Mon-Fri 8AM-8PM" },
@@ -16,10 +17,13 @@ const paymentMethods = [
 
 export default function Checkout() {
   const navigate = useNavigate();
-  const { cartItems } = useCart();
+  const { cartItems, removeItem } = useCart();
+  const { token } = useAuth();
   const [selectedLocation, setSelectedLocation] = useState(1);
   const [selectedPayment, setSelectedPayment] = useState("cash");
   const [form, setForm] = useState({ fullname: "", email: "", phone: "" });
+  const [ordering, setOrdering] = useState(false);
+  const [orderError, setOrderError] = useState("");
 
   const handleChange = (e) => setForm({ ...form, [e.target.name]: e.target.value });
 
@@ -29,6 +33,40 @@ export default function Checkout() {
 
   const selectedLocationName = locations.find((l) => l.id === selectedLocation)?.name;
   const selectedPaymentLabel = paymentMethods.find((p) => p.id === selectedPayment)?.label;
+
+  const handleConfirmOrder = async () => {
+    if (!form.fullname || !form.email) { setOrderError("Please fill in your name and email."); return; }
+    if (cartItems.length === 0) { setOrderError("Your cart is empty."); return; }
+    setOrderError("");
+    setOrdering(true);
+    try {
+      const res = await fetch("/api/orders", {
+        method: "POST",
+        headers: { "Content-Type": "application/json", Authorization: `Bearer ${token}` },
+        body: JSON.stringify({
+          items: cartItems.map((i) => ({ product_id: i.id, quantity: i.quantity, unit_price: i.price })),
+          subtotal,
+          tax_amount: tax,
+          total_amount: total,
+          payment_method: selectedPayment,
+          meetup_location_name: selectedLocationName,
+          contact: form,
+        }),
+      });
+      if (res.ok) {
+        // Clear cart items after successful order
+        cartItems.forEach((i) => removeItem(i.id));
+        navigate("/buyerprofile");
+      } else {
+        const data = await res.json();
+        setOrderError(data.message || "Order failed. Please try again.");
+      }
+    } catch {
+      setOrderError("Network error. Is the server running?");
+    } finally {
+      setOrdering(false);
+    }
+  };
 
   const inputClass =
     "border border-[#F5A623] p-3 w-full rounded-lg outline-none placeholder:text-gray-300 text-sm focus:ring-2 focus:ring-[#F5A623]/30 transition-colors mt-1 bg-white";
@@ -218,11 +256,13 @@ export default function Checkout() {
               <p>Payment: {selectedPaymentLabel}</p>
             </div>
 
+            {orderError && <p className="text-red-500 text-sm mt-2">{orderError}</p>}
             <button
-              onClick={() => navigate("/")}
-              className="mt-4 w-full bg-[#F5A623] text-white font-semibold py-3 rounded-lg text-sm hover:bg-[#e09610] transition-colors"
+              onClick={handleConfirmOrder}
+              disabled={ordering}
+              className="mt-4 w-full bg-[#F5A623] text-white font-semibold py-3 rounded-lg text-sm hover:bg-[#e09610] disabled:opacity-60 transition-colors"
             >
-              Confirm Order
+              {ordering ? "Placing Order..." : "Confirm Order"}
             </button>
           </div>
         </div>

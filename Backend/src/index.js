@@ -9,6 +9,8 @@ import userRoutes from "./routes/users.js";
 import productRoutes from "./routes/products.js";
 import orderRoutes from "./routes/orders.js";
 import conversationRoutes from "./routes/conversations.js";
+import wishlistRoutes from "./routes/wishlists.js";
+import notificationRoutes from "./routes/notifications.js";
 
 const app = express();
 
@@ -23,6 +25,8 @@ app.use("/api/users", userRoutes);
 app.use("/api/products", productRoutes);
 app.use("/api/orders", orderRoutes);
 app.use("/api/conversations", conversationRoutes);
+app.use("/api/wishlists", wishlistRoutes);
+app.use("/api/notifications", notificationRoutes);
 
 // Health check
 app.get("/", (req, res) => {
