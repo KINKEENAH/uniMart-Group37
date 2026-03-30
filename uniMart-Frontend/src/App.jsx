@@ -1,7 +1,8 @@
-import { Routes, Route, useLocation } from "react-router-dom";
+import { Routes, Route, useLocation, Navigate } from "react-router-dom";
 import { AnimatePresence } from "framer-motion";
 import NavBar from "./components/navbar";
 import RequireAuth from "./components/RequireAuth";
+import { useAuth } from "./context/authContext";
 import "./App.css";
 import Home from "./pages/home";
 import Login from "./pages/auth/login";
@@ -24,14 +25,15 @@ import SellerPublicProfile from "./pages/sellerPublicProfile";
 
 function App() {
   const location = useLocation();
+  const { isLoggedIn } = useAuth();
   const hideNavbar = ["/signup", "/login"].includes(location.pathname);
   return (
     <>
       {!hideNavbar && <NavBar />}
       <AnimatePresence mode="wait">
         <Routes location={location} key={location.pathname}>
-          {/* Public */}
-          <Route path="/" element={<Home />} />
+          {/* Home — redirect to shop if logged in */}
+          <Route path="/" element={isLoggedIn ? <Navigate to="/shop" replace /> : <Home />} />
           <Route path="/login" element={<Login />} />
           <Route path="/signup" element={<Signup />} />
           <Route path="/emailotp" element={<EmailOtp />} />
@@ -40,6 +42,7 @@ function App() {
           <Route path="/contact" element={<ContactUs />} />
           <Route path="/shop" element={<Shop />} />
           <Route path="/productdetails" element={<ProductDetails />} />
+          <Route path="/seller/:id" element={<SellerPublicProfile />} />
 
           {/* Protected */}
           <Route path="/buyerprofile" element={<RequireAuth><BuyerProfile /></RequireAuth>} />
@@ -50,7 +53,6 @@ function App() {
           <Route path="/notification" element={<RequireAuth><Notification /></RequireAuth>} />
           <Route path="/chatseller" element={<RequireAuth><ChatSeller /></RequireAuth>} />
           <Route path="/sellerdashboard" element={<RequireAuth><SellerDash /></RequireAuth>} />
-          <Route path="/seller/:id" element={<SellerPublicProfile />} />
         </Routes>
       </AnimatePresence>
     </>
