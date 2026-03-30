@@ -42,7 +42,7 @@ export default function SellerPublicProfile() {
 
   return (
     <div className="min-h-screen bg-[#F5F0E8] pt-16 pb-16">
-      <div className="px-4 md:px-10 py-6 space-y-5 max-w-4xl mx-auto">
+      <div className="px-4 md:px-10 py-6 space-y-5">
 
         {/* Back */}
         <button onClick={() => navigate(-1)} className="flex items-center gap-1 text-sm text-gray-500 hover:text-gray-800 cursor-pointer bg-transparent border-none">

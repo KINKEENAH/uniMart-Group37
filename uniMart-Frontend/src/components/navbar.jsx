@@ -20,15 +20,16 @@ export default function Navbar() {
   const navigate = useNavigate();
   const location = useLocation();
 
-  // Theme based on auth state
-  const bg = isLoggedIn ? "bg-[#E0D8CC]" : "bg-[#0D1B2A]";
-  const border = isLoggedIn ? "border-[rgba(0,0,0,0.08)]" : "border-[rgba(245,166,35,0.15)]";
-  const textDefault = isLoggedIn ? "text-gray-800" : "text-gray-300";
+  // Dark theme on home page always; light theme elsewhere when logged in
+  const isDark = !isLoggedIn || location.pathname === "/";
+  const bg = isDark ? "bg-[#0D1B2A]" : "bg-[#E0D8CC]";
+  const border = isDark ? "border-[rgba(245,166,35,0.15)]" : "border-[rgba(0,0,0,0.08)]";
+  const textDefault = isDark ? "text-gray-300" : "text-gray-800";
   const textActive = "text-[#F5A623]";
-  const logo = isLoggedIn ? logoBnw : logoDark;
-  const mobileBg = isLoggedIn ? "bg-[#E0D8CC]" : "bg-[#0D1B2A]";
-  const mobileBorder = isLoggedIn ? "border-gray-300" : "border-gray-700";
-  const hamburgerColor = isLoggedIn ? "text-gray-800" : "text-gray-300";
+  const logo = isDark ? logoDark : logoBnw;
+  const mobileBg = isDark ? "bg-[#0D1B2A]" : "bg-[#E0D8CC]";
+  const mobileBorder = isDark ? "border-gray-700" : "border-gray-300";
+  const hamburgerColor = isDark ? "text-gray-300" : "text-gray-800";
 
   const handleLogout = () => { logout(); navigate("/login"); };
 
