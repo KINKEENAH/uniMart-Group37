@@ -18,20 +18,32 @@ router.get("/", async (req, res) => {
     } catch {}
   }
 
-  const { category } = req.query;
+  const { category, search, minPrice, maxPrice, sortBy, inStock } = req.query;
 
   try {
     const where = {
       status: "active",
       ...(excludeUserId && { seller_id: { not: excludeUserId } }),
-      ...(category && {
-        category: { name: { equals: category, mode: "insensitive" } },
-      }),
+      ...(category && { category: { name: { equals: category, mode: "insensitive" } } }),
+      ...(search && { title: { contains: search, mode: "insensitive" } }),
+      ...(minPrice || maxPrice ? {
+        price: {
+          ...(minPrice ? { gte: parseFloat(minPrice) } : {}),
+          ...(maxPrice ? { lte: parseFloat(maxPrice) } : {}),
+        }
+      } : {}),
+      ...(inStock === "true" ? { stock_quantity: { gt: 0 } } : {}),
     };
+
+    const orderBy =
+      sortBy === "price_asc" ? { price: "asc" } :
+      sortBy === "price_desc" ? { price: "desc" } :
+      sortBy === "popular" ? { views: "desc" } :
+      { created_at: "desc" };
 
     const products = await prisma.product.findMany({
       where,
-      orderBy: { created_at: "desc" },
+      orderBy,
       include: {
         images: { orderBy: { display_order: "asc" }, take: 1 },
         category: true,
@@ -133,6 +145,22 @@ router.post(
   }
 );
 
+// ─── GET /api/products/mine ───────────────────────────────────────────────────
+// Get all products for the logged-in seller
+router.get("/mine", requireAuth, async (req, res) => {
+  try {
+    const products = await prisma.product.findMany({
+      where: { seller_id: req.userId },
+      include: { images: { orderBy: { display_order: "asc" } }, category: true },
+      orderBy: { created_at: "desc" },
+    });
+    return res.json({ products });
+  } catch (err) {
+    console.error(err);
+    return res.status(500).json({ message: "Internal server error" });
+  }
+});
+
 // ─── GET /api/products/:id ────────────────────────────────────────────────────
 router.get("/:id", async (req, res) => {
   try {
@@ -164,22 +192,6 @@ router.get("/:id", async (req, res) => {
     });
 
     return res.json({ product });
-  } catch (err) {
-    console.error(err);
-    return res.status(500).json({ message: "Internal server error" });
-  }
-});
-
-// ─── GET /api/products/mine ───────────────────────────────────────────────────
-// Get all products for the logged-in seller
-router.get("/mine", requireAuth, async (req, res) => {
-  try {
-    const products = await prisma.product.findMany({
-      where: { seller_id: req.userId },
-      include: { images: { orderBy: { display_order: "asc" } }, category: true },
-      orderBy: { created_at: "desc" },
-    });
-    return res.json({ products });
   } catch (err) {
     console.error(err);
     return res.status(500).json({ message: "Internal server error" });

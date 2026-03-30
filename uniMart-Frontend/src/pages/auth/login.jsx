@@ -4,6 +4,7 @@ import { useState } from "react";
 import { motion } from "framer-motion";
 import loginImage from "../../assets/login.png";
 import logo from "../../assets/UniMart.png";
+import { useAuth } from "../../context/authContext";
 
 export default function Login() {
   const [email, setEmail] = useState("");
@@ -14,7 +15,8 @@ export default function Login() {
   const [loading, setLoading] = useState(false);
   const navigate = useNavigate();
   const location = useLocation();
-  const from = location.state?.from || "/";
+  const { login } = useAuth();
+  const from = location.state?.from || "/shop";
 
   const handleLogin = async () => {
     setError("");
@@ -104,7 +106,7 @@ export default function Login() {
               Remember me
             </label>
             <span
-              onClick={() => navigate("/resetpassword")}
+              onClick={() => navigate("/contact")}
               className="text-sm text-gray-500 cursor-pointer hover:underline"
             >
               Reset Password?
