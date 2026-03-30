@@ -85,7 +85,7 @@ export default function SellerProfile() {
   const phone = user?.phone || "—";
   const department = user?.department || "—";
   const level = user?.level || "—";
-  const location = user?.campus_location || "—";
+  const campusLocation = user?.campus_location || "—";
   const studentSince = user?.student_since
     ? new Date(user.student_since).getFullYear()
     : user?.created_at
@@ -146,7 +146,7 @@ export default function SellerProfile() {
             <span className="flex items-center gap-2"><Calendar size={12} /> Since {studentSince}</span>
             <span className="flex items-center gap-2"><GraduationCap size={12} /> {department}</span>
             <span className="flex items-center gap-2"><User size={12} /> {level}</span>
-            <span className="flex items-center gap-2"><MapPin size={12} /> {location}</span>
+            <span className="flex items-center gap-2"><MapPin size={12} /> {campusLocation}</span>
           </div>
 
           {/* Action buttons */}
