@@ -1,5 +1,6 @@
 import { useEffect, useState } from "react";
 import { useNavigate, useLocation } from "react-router-dom";
+<<<<<<< HEAD
 import {
   Star,
   MapPin,
@@ -8,6 +9,9 @@ import {
   Package,
   Heart,
 } from "lucide-react";
+=======
+import { Star, MapPin, ShoppingCart, MessageCircle, Package, Heart } from "lucide-react";
+>>>>>>> 749fcef2984d22cfd0d4396bfb9404a16b0d90e4
 import { useCart } from "../context/cartContext";
 import { useAuth } from "../context/authContext";
 import { useWishlist } from "../context/wishlistContext";
@@ -100,10 +104,11 @@ export default function ProductDetails() {
   const title = display?.title || display?.name || "—";
 
   return (
-    <div className="min-h-screen bg-[#F5F0E8] pt-16 pb-16">
+    <div className="min-h-screen bg-[#F5F0E8] pt-16 pb-6">
       {/* Breadcrumb + View Cart */}
       <div className="px-10 py-4 flex items-center justify-between">
         <div className="flex items-center gap-1 text-sm text-gray-500">
+<<<<<<< HEAD
           <span
             className="cursor-pointer hover:text-gray-800"
             onClick={() => navigate("/shop")}
@@ -114,6 +119,10 @@ export default function ProductDetails() {
             className="cursor-pointer hover:text-gray-800"
             onClick={() => navigate("/shop")}
           >{`> ${title}`}</span>
+=======
+          <span className="cursor-pointer hover:text-gray-800" onClick={() => navigate("/shop")}>{">"}</span>
+          <span className="cursor-pointer hover:text-gray-800" onClick={() => navigate("/shop")}>{`> ${title}`}</span>
+>>>>>>> 749fcef2984d22cfd0d4396bfb9404a16b0d90e4
         </div>
         <button
           onClick={() => navigate("/viewcart")}
@@ -125,6 +134,7 @@ export default function ProductDetails() {
 
       <div className="px-10 pb-16 flex flex-col md:flex-row gap-10">
         {/* Product image — shows immediately from preview */}
+<<<<<<< HEAD
         <div className="w-full md:w-1/2 bg-white rounded-xl overflow-hidden flex items-center justify-center min-h-105">
           {coverImage ? (
             <img
@@ -132,6 +142,11 @@ export default function ProductDetails() {
               alt={title}
               className="w-full h-full object-cover"
             />
+=======
+        <div className="w-full md:w-[42%] bg-white rounded-xl overflow-hidden flex items-center justify-center h-72 md:h-120 shrink-0">
+          {coverImage ? (
+            <img src={coverImage} alt={title} className="w-full h-full object-cover" />
+>>>>>>> 749fcef2984d22cfd0d4396bfb9404a16b0d90e4
           ) : (
             <Package size={64} className="text-gray-200" />
           )}
@@ -142,9 +157,13 @@ export default function ProductDetails() {
           {/* Name + price show immediately */}
           <h1 className="text-2xl font-bold text-gray-900">{title}</h1>
           <div className="flex items-center gap-3">
+<<<<<<< HEAD
             <span className="text-2xl font-bold text-[#F5A623]">
               ₵{price.toFixed(2)}
             </span>
+=======
+            <span className="text-2xl font-bold text-[#F5A623]">₵{price.toFixed(2)}</span>
+>>>>>>> 749fcef2984d22cfd0d4396bfb9404a16b0d90e4
             {originalPrice && (
               <>
                 <span className="text-sm text-gray-400 line-through">
@@ -172,6 +191,7 @@ export default function ProductDetails() {
               <div className="flex items-center gap-3">
                 <div className="flex items-center gap-1 text-sm text-gray-700">
                   <Star size={15} className="fill-[#F5A623] text-[#F5A623]" />
+<<<<<<< HEAD
                   {product.seller?.rating
                     ? product.seller.rating.toFixed(1)
                     : "0.0"}
@@ -179,6 +199,11 @@ export default function ProductDetails() {
                 <span
                   className={`text-xs px-3 py-1 rounded-full ${product.stock_quantity > 0 ? "bg-blue-100 text-blue-600" : "bg-red-100 text-red-500"}`}
                 >
+=======
+                  {product.seller?.rating?.toFixed(1) || "0.0"}
+                </div>
+                <span className={`text-xs px-3 py-1 rounded-full ${product.stock_quantity > 0 ? "bg-blue-100 text-blue-600" : "bg-red-100 text-red-500"}`}>
+>>>>>>> 749fcef2984d22cfd0d4396bfb9404a16b0d90e4
                   {product.stock_quantity > 0 ? "In Stock" : "Out of Stock"}
                 </span>
               </div>
@@ -186,18 +211,24 @@ export default function ProductDetails() {
               {/* Description */}
               {product.description && (
                 <div>
+<<<<<<< HEAD
                   <h3 className="font-semibold text-gray-900 mb-1">
                     Description
                   </h3>
                   <p className="text-sm text-gray-500 leading-relaxed">
                     {product.description}
                   </p>
+=======
+                  <h3 className="font-semibold text-gray-900 mb-1">Description</h3>
+                  <p className="text-sm text-gray-500 leading-relaxed">{product.description}</p>
+>>>>>>> 749fcef2984d22cfd0d4396bfb9404a16b0d90e4
                 </div>
               )}
 
               {/* Key Features */}
               {product.key_features?.length > 0 && (
                 <div>
+<<<<<<< HEAD
                   <h3 className="font-semibold text-gray-900 mb-2">
                     Key Features
                   </h3>
@@ -207,6 +238,12 @@ export default function ProductDetails() {
                         key={f.id}
                         className="text-sm text-gray-600 flex items-center gap-2"
                       >
+=======
+                  <h3 className="font-semibold text-gray-900 mb-2">Key Features</h3>
+                  <ul className="space-y-1">
+                    {product.key_features.map((f) => (
+                      <li key={f.id} className="text-sm text-gray-600 flex items-center gap-2">
+>>>>>>> 749fcef2984d22cfd0d4396bfb9404a16b0d90e4
                         <span className="w-1.5 h-1.5 rounded-full bg-gray-500 inline-block" />
                         {f.feature}
                       </li>
@@ -218,6 +255,7 @@ export default function ProductDetails() {
               {/* Seller card */}
               <div className="border border-gray-200 rounded-xl p-4 flex items-start justify-between bg-white">
                 <div className="flex flex-col gap-1">
+<<<<<<< HEAD
                   <p className="text-sm font-semibold text-gray-800">
                     {product.seller?.full_name || "—"}
                   </p>
@@ -227,6 +265,12 @@ export default function ProductDetails() {
                       ? product.seller.rating.toFixed(1)
                       : "0.0"}{" "}
                     rating • {product.seller?.total_sales || 0} sales
+=======
+                  <p className="text-sm font-semibold text-gray-800">{product.seller?.full_name || "—"}</p>
+                  <div className="flex items-center gap-1 text-xs text-gray-500">
+                    <Star size={12} className="fill-[#F5A623] text-[#F5A623]" />
+                    {product.seller?.rating?.toFixed(1) || "0.0"} rating • {product.seller?.total_sales || 0} sales
+>>>>>>> 749fcef2984d22cfd0d4396bfb9404a16b0d90e4
                   </div>
                   {product.seller?.campus_location && (
                     <div className="flex items-center gap-1 text-xs text-gray-500">
@@ -234,9 +278,13 @@ export default function ProductDetails() {
                     </div>
                   )}
                 </div>
+<<<<<<< HEAD
                 <span className="text-xs text-gray-400">
                   Joined since {sellerJoined}
                 </span>
+=======
+                <span className="text-xs text-gray-400">Joined since {sellerJoined}</span>
+>>>>>>> 749fcef2984d22cfd0d4396bfb9404a16b0d90e4
               </div>
             </>
           )}
@@ -252,14 +300,19 @@ export default function ProductDetails() {
             </button>
             <button
               onClick={() => {
+<<<<<<< HEAD
                 if (!isLoggedIn) {
                   navigate("/login");
                   return;
                 }
+=======
+                if (!isLoggedIn) { navigate("/login"); return; }
+>>>>>>> 749fcef2984d22cfd0d4396bfb9404a16b0d90e4
                 toggleWishlist(display.id);
               }}
               className="px-4 py-3 rounded-xl border border-gray-200 bg-white cursor-pointer hover:border-[#F5A623] transition-colors"
             >
+<<<<<<< HEAD
               <Heart
                 size={18}
                 className={
@@ -283,6 +336,14 @@ export default function ProductDetails() {
                     productTitle: title,
                   },
                 });
+=======
+              <Heart size={18} className={wishlistIds.has(display?.id) ? "fill-[#F5A623] text-[#F5A623]" : "text-gray-400"} />
+            </button>
+            <button
+              onClick={() => {
+                if (!isLoggedIn) { navigate("/login"); return; }
+                navigate("/chatseller", { state: { sellerId: product?.seller?.id, sellerName: product?.seller?.full_name, productId: display.id, productTitle: title } });
+>>>>>>> 749fcef2984d22cfd0d4396bfb9404a16b0d90e4
               }}
               className="flex-1 flex items-center justify-center gap-2 bg-[#1A1A2E] text-white py-3 rounded-xl text-sm font-semibold cursor-pointer hover:bg-[#2a2a4e] transition-colors"
             >

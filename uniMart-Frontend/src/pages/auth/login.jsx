@@ -16,7 +16,11 @@ export default function Login() {
   const navigate = useNavigate();
   const location = useLocation();
   const { login } = useAuth();
+<<<<<<< HEAD
   const from = location.state?.from || "/";
+=======
+  const from = location.state?.from || "/shop";
+>>>>>>> 749fcef2984d22cfd0d4396bfb9404a16b0d90e4
 
   const handleLogin = async () => {
     setError("");

@@ -75,60 +75,52 @@ export default function SellerProfile() {
       <div className="px-6 py-6 space-y-5">
 
         {/* Profile Header */}
-        <div className="bg-white rounded-xl border border-gray-200 p-6">
-          <div className="flex flex-col md:flex-row justify-between gap-4">
-            <div className="flex gap-5 items-start">
-              <div className="relative shrink-0">
-                <div className="w-20 h-20 rounded-full bg-gray-200 flex items-center justify-center overflow-hidden">
-                  <User size={40} className="text-gray-400" />
-                </div>
-                <button className="absolute top-0 right-0 bg-white border border-gray-200 rounded-full p-1 cursor-pointer">
-                  <Pencil size={11} className="text-gray-500" />
-                </button>
-                <div className="absolute bottom-0 right-0 bg-blue-500 rounded-full p-1">
-                  <ShieldCheck size={11} className="text-white" />
-                </div>
+        <div className="bg-white rounded-xl border border-gray-200 p-4 md:p-6">
+          <div className="flex items-start gap-3 mb-4">
+            <div className="relative shrink-0">
+              <div className="w-16 h-16 md:w-20 md:h-20 rounded-full bg-gray-200 flex items-center justify-center overflow-hidden">
+                <User size={32} className="text-gray-400" />
               </div>
-
-              <div>
-                <h1 className="text-xl font-bold text-gray-900">{name}</h1>
-                <div className="flex items-center gap-3 mt-1">
-                  <span className="flex items-center gap-1 text-sm text-[#F5A623]">
-                    <Star size={13} className="fill-[#F5A623]" /> {rating.toFixed(1)}
-                  </span>
-                  <span className="text-sm text-gray-400">{totalSales} sales</span>
-                  <span className="flex items-center gap-1 text-sm text-[#F5A623]">
-                    <ShieldCheck size={13} /> {user?.is_verified ? "Verified Student" : "Unverified"}
-                  </span>
-                </div>
-                <div className="grid grid-cols-1 md:grid-cols-3 gap-x-10 gap-y-2 mt-3 text-sm text-gray-500">
-                  <span className="flex items-center gap-2"><Mail size={13} /> {email}</span>
-                  <span className="flex items-center gap-2"><Phone size={13} /> {phone}</span>
-                  <span className="flex items-center gap-2"><Calendar size={13} /> Student since {studentSince}</span>
-                  <span className="flex items-center gap-2"><GraduationCap size={13} /> {department}</span>
-                  <span className="flex items-center gap-2"><User size={13} /> {level}</span>
-                  <span className="flex items-center gap-2"><MapPin size={13} /> {location}</span>
-                </div>
+              <button className="absolute top-0 right-0 bg-white border border-gray-200 rounded-full p-1 cursor-pointer">
+                <Pencil size={10} className="text-gray-500" />
+              </button>
+              <div className="absolute bottom-0 right-0 bg-blue-500 rounded-full p-1">
+                <ShieldCheck size={10} className="text-white" />
               </div>
             </div>
 
-            <div className="flex flex-col gap-2 items-end shrink-0">
-              <button onClick={() => setShowEdit(true)} className="flex items-center gap-2 bg-[#1A1A2E] text-white text-sm px-4 py-2 rounded-lg cursor-pointer hover:bg-[#2a2a4e] transition-colors">
-                <Pencil size={13} /> Edit
-              </button>
-              <button
-                onClick={() => navigate("/buyerprofile")}
-                className="flex items-center gap-2 bg-[#F5A623] text-white text-sm px-4 py-2 rounded-lg cursor-pointer hover:bg-[#e09610] transition-colors"
-              >
-                Switch to Buyer Profile
-              </button>
-              <button
-                onClick={() => { logout(); navigate("/login"); }}
-                className="flex items-center gap-2 border border-red-300 text-red-500 text-sm px-4 py-2 rounded-lg cursor-pointer hover:bg-red-50 transition-colors"
-              >
-                <LogOut size={13} /> Logout
-              </button>
+            <div className="flex-1 min-w-0">
+              <h1 className="text-base md:text-xl font-bold text-gray-900 truncate">{name}</h1>
+              <div className="flex flex-wrap items-center gap-2 mt-1">
+                <span className="flex items-center gap-1 text-xs text-[#F5A623]">
+                  <Star size={12} className="fill-[#F5A623]" /> {rating.toFixed(1)}
+                </span>
+                <span className="text-xs text-gray-400">{totalSales} sales</span>
+                <span className="flex items-center gap-1 text-xs text-[#F5A623]">
+                  <ShieldCheck size={12} /> {user?.is_verified ? "Verified" : "Unverified"}
+                </span>
+              </div>
             </div>
+          </div>
+
+          {/* Contact info */}
+          <div className="grid grid-cols-1 md:grid-cols-3 gap-x-10 gap-y-1.5 text-xs md:text-sm text-gray-500 mb-4">
+            <span className="flex items-center gap-2 truncate"><Mail size={12} /> {email}</span>
+            <span className="flex items-center gap-2"><Phone size={12} /> {phone}</span>
+            <span className="flex items-center gap-2"><Calendar size={12} /> Since {studentSince}</span>
+            <span className="flex items-center gap-2"><GraduationCap size={12} /> {department}</span>
+            <span className="flex items-center gap-2"><User size={12} /> {level}</span>
+            <span className="flex items-center gap-2"><MapPin size={12} /> {location}</span>
+          </div>
+
+          {/* Action buttons */}
+          <div className="flex flex-col sm:flex-row gap-2">
+            <button onClick={() => setShowEdit(true)} className="flex items-center justify-center gap-2 bg-[#1A1A2E] text-white text-xs md:text-sm px-4 py-2 rounded-lg cursor-pointer hover:bg-[#2a2a4e] transition-colors">
+              <Pencil size={12} /> Edit Profile
+            </button>
+            <button onClick={() => navigate("/buyerprofile")} className="flex items-center justify-center gap-2 bg-[#F5A623] text-white text-xs md:text-sm px-4 py-2 rounded-lg cursor-pointer hover:bg-[#e09610] transition-colors">
+              Switch to Buyer
+            </button>
           </div>
         </div>
 
@@ -152,7 +144,7 @@ export default function SellerProfile() {
         <div className="grid grid-cols-2 bg-white rounded-xl border border-gray-200 overflow-hidden">
           <button
             onClick={() => setActiveTab("products")}
-            className={`flex items-center justify-center gap-2 py-3 text-sm font-semibold cursor-pointer border-r border-gray-200 transition-colors ${
+            className={`flex items-center justify-center gap-2 py-3 text-xs md:text-sm font-semibold cursor-pointer border-r border-gray-200 transition-colors ${
               activeTab === "products" ? "text-gray-900 border-b-2 border-b-gray-900" : "text-gray-400 hover:text-gray-600"
             }`}
           >
@@ -160,7 +152,7 @@ export default function SellerProfile() {
           </button>
           <button
             onClick={() => setActiveTab("orders")}
-            className={`flex items-center justify-center gap-2 py-3 text-sm font-semibold cursor-pointer transition-colors ${
+            className={`flex items-center justify-center gap-2 py-3 text-xs md:text-sm font-semibold cursor-pointer transition-colors ${
               activeTab === "orders" ? "text-gray-900 border-b-2 border-b-gray-900" : "text-gray-400 hover:text-gray-600"
             }`}
           >
@@ -234,6 +226,11 @@ export default function SellerProfile() {
             No order history yet.
           </div>
         )}
+
+        {/* Logout — bottom of page */}
+        <div className="pt-4 border-t border-gray-200">
+        </div>
+
       </div>
     </div>
   );
