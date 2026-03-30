@@ -7,7 +7,7 @@
   "scripts": {
     "start": "node src/index.js",
     "dev": "nodemon src/index.js",
-    "build:frontend": "cd ../uniMart-Frontend && npm install && npm run build",
+    "build:frontend": "cd ../uniMart-Frontend && npm install --include=dev && npm run build",
     "start:full": "npm run build:frontend && npm run start",
     "db:generate": "prisma generate",
     "db:migrate": "prisma migrate dev",
