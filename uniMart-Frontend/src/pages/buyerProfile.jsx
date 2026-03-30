@@ -7,6 +7,8 @@ import {
 import { useAuth } from "../context/authContext";
 import { useWishlist } from "../context/wishlistContext";
 import EditProfileModal from "../components/EditProfileModal";
+import IncompleteProfileModal from "../components/IncompleteProfileModal";
+import SellerOnboardingModal from "../components/SellerOnboardingModal";
 
 const tabs = ["MY PURCHASES", "WISHLIST", "SAVED SELLERS"];
 const filters = ["ALL ORDERS", "DELIVERED", "PENDING"];
@@ -20,6 +22,9 @@ export default function BuyerProfile() {
   const [activeTab, setActiveTab] = useState("MY PURCHASES");
   const [activeFilter, setActiveFilter] = useState("ALL ORDERS");
   const [showEdit, setShowEdit] = useState(false);
+  const [showIncomplete, setShowIncomplete] = useState(false);
+  const [showSellerTerms, setShowSellerTerms] = useState(false);
+  const [missingFields, setMissingFields] = useState([]);
   const [orders, setOrders] = useState([]);
   const [loadingOrders, setLoadingOrders] = useState(true);
 
@@ -91,9 +96,46 @@ export default function BuyerProfile() {
 
   const totalSpent = orders.reduce((sum, o) => sum + parseFloat(o.total_amount), 0);
 
+  const handleSwitchToSeller = () => {
+    const missing = [];
+    if (!user?.phone) missing.push("Phone Number");
+    if (!user?.department) missing.push("Department / Programme");
+    if (!user?.level) missing.push("Level");
+    if (!user?.campus_location) missing.push("Campus Location");
+    if (missing.length > 0) {
+      setMissingFields(missing);
+      setShowIncomplete(true);
+      return;
+    }
+    // Check if user has already agreed to seller terms
+    const agreedKey = `seller_terms_agreed_${user?.id}`;
+    if (localStorage.getItem(agreedKey) === "true") {
+      navigate("/sellerprofile");
+    } else {
+      setShowSellerTerms(true);
+    }
+  };
+
   return (
     <div className="min-h-screen bg-[#F5F0E8] pt-16 pb-16">
       {showEdit && <EditProfileModal onClose={() => setShowEdit(false)} />}
+      {showIncomplete && (
+        <IncompleteProfileModal
+          missing={missingFields}
+          onClose={() => setShowIncomplete(false)}
+          onEdit={() => { setShowIncomplete(false); setShowEdit(true); }}
+        />
+      )}
+      {showSellerTerms && (
+        <SellerOnboardingModal
+          onClose={() => setShowSellerTerms(false)}
+          onAccept={() => {
+            localStorage.setItem(`seller_terms_agreed_${user?.id}`, "true");
+            setShowSellerTerms(false);
+            navigate("/sellerprofile");
+          }}
+        />
+      )}
       <div className="px-3 md:px-6 py-4 md:py-6 space-y-4 md:space-y-5">
 
         {/* Profile Header */}
@@ -138,7 +180,7 @@ export default function BuyerProfile() {
             <button onClick={() => setShowEdit(true)} className="flex items-center justify-center gap-2 bg-[#1A1A2E] text-white text-xs md:text-sm px-4 py-2 rounded-lg cursor-pointer hover:bg-[#2a2a4e] transition-colors">
               <Pencil size={12} /> Edit Profile
             </button>
-            <button onClick={() => navigate("/sellerprofile")} className="flex items-center justify-center gap-2 bg-[#F5A623] text-white text-xs md:text-sm px-4 py-2 rounded-lg cursor-pointer hover:bg-[#e09610] transition-colors">
+            <button onClick={handleSwitchToSeller} className="flex items-center justify-center gap-2 bg-[#F5A623] text-white text-xs md:text-sm px-4 py-2 rounded-lg cursor-pointer hover:bg-[#e09610] transition-colors">
               Switch to Seller
             </button>
           </div>
